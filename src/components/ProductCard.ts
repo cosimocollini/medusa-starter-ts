@@ -9,17 +9,18 @@ export const ProductCard = (product: Product) => {
 
   return `
     <article class="product-card" data-id="${product.id}" aria-labelledby="title-${product.id}">
-      <a href="/products/${product.handle}" data-link aria-label="Visualizza dettagli per ${product.title}">
-        <img src="${product.thumbnail || '/placeholder.png'}" alt="" role="presentation" loading="lazy" />
-        <div class="product-info">
-          <h3 id="title-${product.id}">${product.title}</h3>
-          <p class="price" aria-label="Prezzo: ${formattedPrice}">${formattedPrice}</p>
+      <a href="/products/${product.handle}" data-link class="product-card__link" aria-label="Visualizza dettagli per ${product.title}">
+        <div class="product-card__image-wrapper">
+          <img src="${product.thumbnail || '/placeholder.png'}" class="product-card__image" alt="" role="presentation" loading="lazy" />
+        </div>
+        <div class="product-card__info">
+          <h3 id="title-${product.id}" class="product-card__title">${product.title}</h3>
+          <p class="product-card__price" aria-label="Prezzo: ${formattedPrice}">${formattedPrice}</p>
         </div>
       </a>
-      <button class="add-to-cart" 
+      <button class="product-card__button" 
               data-variant-id="${product.variants?.[0]?.id}"
-              aria-label="Aggiungi ${product.title} al carrello"
-              style="min-height: 44px; min-width: 44px;">
+              aria-label="Aggiungi ${product.title} al carrello">
         Aggiungi al carrello
       </button>
     </article>

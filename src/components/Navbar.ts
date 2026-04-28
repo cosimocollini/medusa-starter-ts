@@ -13,7 +13,9 @@ export const renderNavbar = async () => {
     
     collectionsHtml = collections
       .map((collection: any) => `
-        <li><a href="/collections/${collection.handle}" data-link>${collection.title}</a></li>
+        <li class="navbar__item">
+          <a href="/collections/${collection.handle}" class="navbar__link" data-link>${collection.title}</a>
+        </li>
       `)
       .join('');
   } catch (error) {
@@ -22,15 +24,12 @@ export const renderNavbar = async () => {
   }
 
   return `
-    <nav class="main-nav global-nav" aria-label="Navigazione principale">
-      <div class="nav-content">
-        <a href="/" class="nav-logo" data-link>Medusa Store</a>
-        <ul class="nav-links">
-          <li><a href="/" data-link>Home</a></li>
-          ${collectionsHtml}
-          <li><a href="/cart" data-link>Carrello</a></li>
-        </ul>
-      </div>
+    <nav class="navbar" aria-label="Navigazione principale">
+      <ul class="navbar__list">
+        <li class="navbar__item"><a href="/" class="navbar__link" data-link>Home</a></li>
+        ${collectionsHtml}
+        <li class="navbar__item"><a href="/cart" class="navbar__link" data-link>Carrello</a></li>
+      </ul>
     </nav>
   `;
 };

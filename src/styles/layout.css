@@ -1,0 +1,41 @@
+@layer layout {
+  .container {
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .grid--products {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+    gap: var(--space-8);
+  }
+
+  .section {
+    padding-block: var(--space-12);
+  }
+
+  /* Header/Footer Layout Patterns */
+  .header {
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-base);
+    background-color: var(--bg-surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .footer {
+    padding-block: var(--space-12);
+    border-top: 1px solid var(--border-base);
+    background-color: var(--bg-muted);
+    margin-block-start: var(--space-12);
+  }
+}

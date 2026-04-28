@@ -1,4 +1,4 @@
-import '@/style.css';
+import '@/styles/index.css';
 import { addRoute, handleRoute } from '@/router';
 import { renderHome } from '@/pages/home';
 import { renderLogin, initLogin } from '@/pages/login';

@@ -25,13 +25,13 @@ export const renderHome = async () => {
   }
 
   const html = `
-    <div class="home-container">
-      <header class="home-header">
+    <div class="container section">
+      <header class="mb-4">
         <h1>Il nostro Catalogo</h1>
-        <p>Esplora i prodotti del nostro store Medusa.</p>
+        <p class="text-muted">Esplora i prodotti del nostro store Medusa.</p>
       </header>
       
-      <main class="product-grid" id="product-grid">
+      <main class="grid grid--products" id="product-grid">
         ${productsHtml}
       </main>
     </div>

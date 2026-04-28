@@ -1,0 +1,45 @@
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    font-size: var(--font-size-base);
+    text-decoration: none;
+    line-height: 1;
+  }
+
+  .btn--primary {
+    background-color: var(--action-primary);
+    color: var(--text-inv);
+  }
+
+  .btn--primary:hover {
+    opacity: 0.9;
+  }
+
+  .btn--secondary {
+    background-color: var(--bg-surface);
+    border-color: var(--border-base);
+    color: var(--text-main);
+  }
+
+  .btn--secondary:hover {
+    background-color: var(--bg-muted);
+    border-color: var(--border-strong);
+  }
+
+  .btn--full {
+    width: 100%;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

@@ -72,3 +72,21 @@ Managed in `src/api/config.ts`.
 Each page exports:
 - `render`: An async function returning the HTML string and page title.
 - `init`: An optional function to attach client-side event listeners after the DOM is updated.
+
+## CSS Architecture
+
+The project follows a modern, modular CSS architecture based on **CSS Layers** and **Design Tokens**.
+
+### Structure (`src/styles/`)
+- `index.css`: Main entry point and layer definitions.
+- `tokens.css`: Design tokens (colors, spacing, typography) using CSS variables.
+- `base.css`: Modern reset and base element styles.
+- `layout.css`: Global layout patterns (containers, grids).
+- `utilities.css`: Utility classes for spacing, typography, and accessibility.
+- `components/`: Modular styles for specific UI components (e.g., `ProductCard.css`).
+
+### Conventions
+- **BEM Methodology**: Use Block-Element-Modifier (e.g., `.btn--primary`) for component styles.
+- **CSS Layers**: Styles are organized into layers (`base`, `layout`, `components`, `utilities`) to manage specificity predictably.
+- **Logical Properties**: Prefer logical properties (e.g., `margin-inline`, `padding-block`) for better internationalization support.
+- **Accessibility**: Use the `.sr-only` utility for screen-reader-only content and ensure high contrast ratios.
