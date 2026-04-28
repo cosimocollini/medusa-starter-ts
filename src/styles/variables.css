@@ -68,6 +68,12 @@
     --container-max-width: 1280px;
     --navbar-height: 4rem;
 
+    /* Icon Sizes */
+    --icon-xs: 1rem;   /* 16px */
+    --icon-sm: 1.25rem; /* 20px */
+    --icon-md: 1.5rem;  /* 24px */
+    --icon-lg: 2rem;    /* 32px */
+
     /* Breakpoints (for reference in @media queries)
        sm: 640px
        md: 768px

@@ -8,6 +8,8 @@
 @import './utilities.css';
 
 /* Component Imports */
-@import './components/Button.css';
-@import './components/Navbar.css';
-@import './components/ProductCard.css';
+@import "./components/Button.css";
+@import "./components/Navbar.css";
+@import "./components/ProductCard.css";
+@import "./components/Icon.css";
+

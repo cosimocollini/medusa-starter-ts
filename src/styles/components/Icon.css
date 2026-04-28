@@ -1,0 +1,28 @@
+@layer components {
+  .icon {
+    display: inline-block;
+    width: var(--icon-md);
+    height: var(--icon-md);
+    vertical-align: middle;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  .icon--xs { width: var(--icon-xs); height: var(--icon-xs); }
+  .icon--sm { width: var(--icon-sm); height: var(--icon-sm); }
+  .icon--lg { width: var(--icon-lg); height: var(--icon-lg); }
+
+  /* Utility to make icon spin for loading states */
+  .icon--spin {
+    animation: icon-spin 1s linear infinite;
+  }
+
+  @keyframes icon-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}

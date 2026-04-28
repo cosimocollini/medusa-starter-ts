@@ -90,3 +90,12 @@ The project follows a modern, modular CSS architecture based on **CSS Layers** a
 - **CSS Layers**: Styles are organized into layers (`base`, `layout`, `components`, `utilities`) to manage specificity predictably.
 - **Logical Properties**: Prefer logical properties (e.g., `margin-inline`, `padding-block`) for better internationalization support.
 - **Accessibility**: Use the `.sr-only` utility for screen-reader-only content and ensure high contrast ratios.
+
+### Icon System
+
+The project uses an **SVG-in-JS** approach for UI icons, managed via `src/utils/icons.ts`.
+
+- **Usage**: Import `getIcon` and pass the icon name and optional size/class.
+- **Customization**: Icons use `stroke="currentColor"`, allowing them to be colored via CSS text color properties.
+- **Sizes**: Standardized via CSS variables (`--icon-sm`, `--icon-md`, etc.).
+- **Accessibility**: Icons are marked with `aria-hidden="true"` by default. Use `.sr-only` for descriptive text when needed.
