@@ -1,5 +1,7 @@
 @layer base {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
@@ -20,17 +22,30 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  img, picture, video, canvas, svg {
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
     display: block;
     max-width: 100%;
     height: auto;
   }
 
-  input, button, textarea, select {
+  input,
+  button,
+  textarea,
+  select {
     font: inherit;
   }
 
-  p, h1, h2, h3, h4, h5, h6 {
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     overflow-wrap: break-word;
     margin-block-start: 0;
   }
@@ -40,19 +55,20 @@
     text-decoration-skip-ink: auto;
   }
 
-  /* Focus states accessibili */
+  /* Focus states */
   :focus-visible {
     outline: 2px solid var(--action-primary);
     outline-offset: 2px;
   }
 
-  /* Miglioramento per utenti con ridotta mobilità o preferenze di animazione */
   @media (prefers-reduced-motion: reduce) {
     html:focus-within {
       scroll-behavior: auto;
     }
-    
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
