@@ -4,6 +4,9 @@
     max-width: var(--container-max-width);
     margin-inline: auto;
     padding-inline: var(--space-4);
+    /* Define as a container for children to query */
+    container-type: inline-size;
+    container-name: var(--container-main);
   }
 
   .grid {
@@ -11,9 +14,17 @@
     gap: var(--space-4);
   }
 
+  /* Mobile-first grid: 1 column by default */
   .grid--products {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+    grid-template-columns: 1fr;
     gap: var(--space-8);
+  }
+
+  /* Desktop grid using Media Queries */
+  @media (min-width: 768px) {
+    .grid--products {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
   }
 
   .section {
