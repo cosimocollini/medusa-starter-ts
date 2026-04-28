@@ -1,4 +1,5 @@
 import { cartStore } from '@/store/cart';
+import { authStore } from '@/store/auth';
 import { t } from '@/utils/i18n';
 import { navigate } from '@/router';
 import { STRIPE_PUBLIC_KEY } from '@/api/config';
@@ -26,6 +27,8 @@ export const renderCheckout = async () => {
     return { html: '', title: '' };
   }
 
+  const user = authStore.currentUser;
+
   const html = `
     <main class="checkout-container">
       <h1 id="checkout-heading">${t('checkout.title')}</h1>
@@ -38,53 +41,82 @@ export const renderCheckout = async () => {
             
             <div class="form-grid">
               <div class="form-group">
-                <label for="email">${t('checkout.email')}</label>
-                <input type="email" id="email" name="email" required autocomplete="email" aria-required="true" />
+                <label for="email" class="form-label">${t('checkout.email')}</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  class="form-input"
+                  required 
+                  autocomplete="email" 
+                  aria-required="true" 
+                  value="${user?.email || ''}"
+                />
               </div>
               
               <div class="form-group half">
-                <label for="first_name">${t('checkout.first_name')}</label>
-                <input type="text" id="first_name" name="first_name" required autocomplete="given-name" aria-required="true" />
+                <label for="first_name" class="form-label">${t('checkout.first_name')}</label>
+                <input 
+                  type="text" 
+                  id="first_name" 
+                  name="first_name" 
+                  class="form-input"
+                  required 
+                  autocomplete="given-name" 
+                  aria-required="true" 
+                  value="${user?.first_name || ''}"
+                />
               </div>
               
               <div class="form-group half">
-                <label for="last_name">${t('checkout.last_name')}</label>
-                <input type="text" id="last_name" name="last_name" required autocomplete="family-name" aria-required="true" />
+                <label for="last_name" class="form-label">${t('checkout.last_name')}</label>
+                <input 
+                  type="text" 
+                  id="last_name" 
+                  name="last_name" 
+                  class="form-input"
+                  required 
+                  autocomplete="family-name" 
+                  aria-required="true" 
+                  value="${user?.last_name || ''}"
+                />
               </div>
               
               <div class="form-group">
-                <label for="address_1">${t('checkout.address')}</label>
-                <input type="text" id="address_1" name="address_1" required autocomplete="shipping street-address" aria-required="true" />
+                <label for="address_1" class="form-label">${t('checkout.address')}</label>
+                <input type="text" id="address_1" name="address_1" class="form-input" required autocomplete="shipping street-address" aria-required="true" />
               </div>
               
               <div class="form-group half">
-                <label for="city">${t('checkout.city')}</label>
-                <input type="text" id="city" name="city" required autocomplete="shipping address-level2" aria-required="true" />
+                <label for="city" class="form-label">${t('checkout.city')}</label>
+                <input type="text" id="city" name="city" class="form-input" required autocomplete="shipping address-level2" aria-required="true" />
               </div>
               
               <div class="form-group half">
-                <label for="postal_code">${t('checkout.postal_code')}</label>
-                <input type="text" id="postal_code" name="postal_code" required autocomplete="shipping postal-code" aria-required="true" />
+                <label for="postal_code" class="form-label">${t('checkout.postal_code')}</label>
+                <input type="text" id="postal_code" name="postal_code" class="form-input" required autocomplete="shipping postal-code" aria-required="true" />
               </div>
 
               <div class="form-group half">
-                <label for="country_code">${t('checkout.country_code')}</label>
-                <input type="text" id="country_code" name="country_code" required placeholder="IT" aria-required="true" />
+                <label for="country_code" class="form-label">${t('checkout.country_code')}</label>
+                <input type="text" id="country_code" name="country_code" class="form-input" required placeholder="IT" aria-required="true" />
               </div>
 
               <div class="form-group half">
-                <label for="phone">${t('checkout.phone')}</label>
-                <input type="tel" id="phone" name="phone" autocomplete="tel" />
+                <label for="phone" class="form-label">${t('checkout.phone')}</label>
+                <input type="tel" id="phone" name="phone" class="form-input" autocomplete="tel" />
               </div>
             </div>
           </section>
 
           <!-- Step 2: Shipping Method (Dynamic) -->
           <section id="shipping-methods-section" class="checkout-section" aria-labelledby="methods-label" hidden>
-            <h2 id="methods-label">${t('checkout.shipping_method')}</h2>
-            <div id="shipping-options-list" class="options-list" role="radiogroup">
-              <!-- Loaded dynamically after address is set -->
-            </div>
+            <fieldset id="shipping-options-fieldset" class="options-list">
+              <legend id="methods-label"><h2 style="margin: 0; font-size: inherit;">${t('checkout.shipping_method')}</h2></legend>
+              <div id="shipping-options-list" class="options-list">
+                <!-- Loaded dynamically after address is set -->
+              </div>
+            </fieldset>
           </section>
 
           <!-- Step 3: Payment (Stripe) -->
@@ -98,7 +130,7 @@ export const renderCheckout = async () => {
 
           <div id="checkout-error" class="error-box" role="alert" aria-live="polite"></div>
 
-          <button type="submit" id="submit-order-btn" class="primary-btn checkout-submit">
+          <button type="submit" id="submit-order-btn" class="primary-btn checkout-submit" style="min-height: 44px;">
             ${t('checkout.complete_order')}
           </button>
         </form>

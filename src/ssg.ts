@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { medusa } from './api/client';
-import type { ProductListResponse } from './api/types';
+import { sdk } from './api/client';
 import { renderHome } from './pages/home';
 import { renderProductDetail } from './pages/product';
 import { renderLogin } from './pages/login';
@@ -9,6 +8,7 @@ import { renderRegister } from './pages/register';
 import { renderAccount } from './pages/account';
 import { renderCart } from './pages/cart';
 import { renderCheckout } from './pages/checkout';
+import { renderNavbar } from './components/Navbar';
 
 /**
  * Custom SSG (Static Site Generation) script.
@@ -27,10 +27,14 @@ const generateSSG = async () => {
 
   console.log('--- Starting SSG Process ---');
 
+  // Fetch the static navbar once to be shared across all pages
+  const globalNavbarHtml = await renderNavbar();
+  console.log('✓ Global Navbar generated.');
+
   // Helper to inject content into template
   const inject = (htmlTemplate: string, content: string, title: string) => {
     return htmlTemplate
-      .replace('<div id="app"></div>', `<div id="app">${content}</div>`)
+      .replace('<div id="app"></div>', `${globalNavbarHtml}\n    <div id="app">${content}</div>`)
       .replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
   };
 
@@ -60,7 +64,7 @@ const generateSSG = async () => {
     }
 
     // 2. Product Detail Pages (PDP)
-    const { products } = await medusa.get<ProductListResponse>('/store/products');
+    const { products } = await sdk.store.product.list();
     console.log(`Found ${products.length} products to prerender.`);
 
     if (!fs.existsSync(PRODUCTS_PATH)) fs.mkdirSync(PRODUCTS_PATH, { recursive: true });

@@ -1,26 +1,25 @@
-import { medusa } from '@/api/client';
-import type { ProductListResponse } from '@/api/types';
+import { sdk } from '@/api/client';
 import { ProductCard } from '@/components/ProductCard';
 
 export const renderHome = async () => {
   let productsHtml = '';
 
   try {
-    // Recupera i prodotti (limite di default 100 per Medusa)
-    const { products } =
-      await medusa.get<ProductListResponse>('/store/products');
+    // Recupera i prodotti usando l'SDK ufficiale
+    const { products } = await sdk.store.product.list();
 
     if (products.length === 0) {
       productsHtml = '<p>Nessun prodotto trovato.</p>';
     } else {
-      productsHtml = products.map((product) => ProductCard(product)).join('');
+      // Cast temporaneo finché non migreremo completamente i tipi a @medusajs/types
+      productsHtml = products.map((product: any) => ProductCard(product)).join('');
     }
   } catch (error) {
     console.error('Errore nel caricamento prodotti:', error);
     productsHtml = `
-      <div class="error-message">
+      <div class="error-message" role="alert">
         <p>Si è verificato un errore nel caricamento dei prodotti. Assicurati che il backend Medusa sia attivo su localhost:9000.</p>
-        <button onclick="window.location.reload()">Riprova</button>
+        <button onclick="window.location.reload()" aria-label="Ricarica la pagina">Riprova</button>
       </div>
     `;
   }
@@ -32,16 +31,9 @@ export const renderHome = async () => {
         <p>Esplora i prodotti del nostro store Medusa.</p>
       </header>
       
-      <div class="product-grid" id="product-grid">
+      <main class="product-grid" id="product-grid">
         ${productsHtml}
-      </div>
-      
-      <nav class="main-nav">
-        <ul>
-          <li><a href="/" data-link aria-current="page">Home</a></li>
-          <li><a href="/cart" data-link>Carrello</a></li>
-        </ul>
-      </nav>
+      </main>
     </div>
   `;
 

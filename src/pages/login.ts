@@ -4,47 +4,55 @@ import { t } from '@/utils/i18n';
 
 /**
  * Renders the login page template with accessible form.
- * Follows WCAG guidelines for form accessibility.
+ * Follows WCAG 2.1 guidelines for form accessibility.
  */
 export const renderLogin = async () => {
   const html = `
-    <div class="login-container">
-      <h1 id="login-heading">${t('common.login')}</h1>
-      
-      <form id="login-form" class="auth-form" aria-labelledby="login-heading">
-        <div class="form-group">
-          <label for="email">${t('auth.email')}</label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            required 
-            autocomplete="email"
-            aria-required="true"
-          />
+    <div class="auth-container">
+      <div class="auth-card">
+        <h1 id="login-heading" class="auth-title">${t('common.login')}</h1>
+        <p class="auth-subtitle">${t('auth.login_subtitle') || 'Accedi al tuo account per gestire i tuoi ordini'}</p>
+        
+        <form id="login-form" class="auth-form" aria-labelledby="login-heading" novalidate>
+          <div class="form-group">
+            <label for="email" class="form-label">${t('auth.email')}</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              class="form-input"
+              required 
+              autocomplete="email"
+              aria-required="true"
+              placeholder="email@example.com"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="password" class="form-label">${t('auth.password')}</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-input"
+              required 
+              autocomplete="current-password"
+              aria-required="true"
+              placeholder="••••••••"
+            />
+          </div>
+          
+          <div id="login-error" class="error-box" role="alert" aria-live="polite"></div>
+          
+          <button type="submit" class="submit-btn primary-btn">
+            ${t('auth.submit')}
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          <p>${t('auth.no_account_prompt') || 'Non hai ancora un account?'}</p>
+          <a href="/register" class="auth-link" data-link>${t('auth.register_title')}</a>
         </div>
-        
-        <div class="form-group">
-          <label for="password">${t('auth.password')}</label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            required 
-            autocomplete="current-password"
-            aria-required="true"
-          />
-        </div>
-        
-        <div id="login-error" class="error-box" role="alert" aria-live="polite"></div>
-        
-        <button type="submit" class="submit-btn">
-          ${t('auth.submit')}
-        </button>
-      </form>
-      
-      <div class="auth-footer">
-        <a href="/register" data-link>${t('auth.no_account')}</a>
       </div>
     </div>
   `;
@@ -70,6 +78,12 @@ export const initLogin = () => {
     
     const submitBtn = form.querySelector('.submit-btn') as HTMLButtonElement;
     
+    // Basic validation
+    if (!email || !password) {
+      if (errorBox) errorBox.textContent = t('auth.fields_required') || 'Tutti i campi sono obbligatori';
+      return;
+    }
+    
     try {
       submitBtn.disabled = true;
       submitBtn.textContent = t('common.loading');
@@ -77,11 +91,11 @@ export const initLogin = () => {
 
       await authStore.login(email, password);
       
-      // Redirect to home on success
-      navigate('/');
-    } catch (error) {
+      // Redirect to account on success
+      navigate('/account');
+    } catch (error: any) {
       if (errorBox) {
-        errorBox.textContent = t('auth.login_failed');
+        errorBox.textContent = error.message || t('auth.login_failed');
       }
       submitBtn.disabled = false;
       submitBtn.textContent = t('auth.submit');

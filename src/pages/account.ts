@@ -3,7 +3,7 @@ import { navigate, handleRoute } from '@/router';
 import { t } from '@/utils/i18n';
 
 /**
- * Renders the customer account dashboard (WCAG compliant).
+ * Renders the customer account dashboard (WCAG 2.1 compliant).
  * SSG: Returns a generic shell/loading state.
  * Client-side: Re-renders when auth state is ready.
  */
@@ -27,6 +27,7 @@ export const renderAccount = async () => {
     const orders = await authStore.getOrders();
 
     const formatPrice = (amount: number, currency: string) => {
+      // Nota: Verificare se Medusa 2.0 richiede /100. In molte config è necessario per i centesimi.
       return new Intl.NumberFormat('it-IT', {
         style: 'currency',
         currency: currency.toUpperCase(),
@@ -34,52 +35,71 @@ export const renderAccount = async () => {
     };
 
     const html = `
-      <main class="account-container">
-        <header class="account-header">
-          <h1>${t('account.title')}</h1>
-          <p>Benvenuto, ${user?.first_name} ${user?.last_name}</p>
-          <button id="logout-btn" class="logout-link">${t('account.logout')}</button>
-        </header>
-        
-        <section class="order-history" aria-labelledby="orders-heading">
-          <h2 id="orders-heading">${t('account.orders')}</h2>
+      <div class="account-layout">
+        <aside class="account-sidebar" aria-label="Menu Account">
+          <nav class="account-nav">
+            <ul>
+              <li><a href="/account" class="active" data-link>${t('account.dashboard') || 'Dashboard'}</a></li>
+              <li><a href="/account/orders" data-link>${t('account.orders')}</a></li>
+              <li><a href="/account/profile" data-link>${t('account.profile') || 'Profilo'}</a></li>
+              <li><button id="logout-btn" class="logout-link">${t('account.logout')}</button></li>
+            </ul>
+          </nav>
+        </aside>
+
+        <main class="account-main-content">
+          <header class="account-header">
+            <h1>${t('account.title')}</h1>
+            <p class="welcome-msg">${t('account.welcome') || 'Bentornato'}, <strong>${user?.first_name} ${user?.last_name}</strong></p>
+          </header>
           
-          ${
-            orders.length === 0
-              ? `
-            <p role="status">${t('account.no_orders')}</p>
-          `
-              : `
-            <div class="orders-table-wrapper">
-              <table class="orders-table" aria-label="Storico ordini">
-                <thead>
-                  <tr>
-                    <th scope="col">${t('account.order_id')}</th>
-                    <th scope="col">${t('account.date')}</th>
-                    <th scope="col">${t('account.total')}</th>
-                    <th scope="col">${t('account.status')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${orders
-                    .map(
-                      (order) => `
-                    <tr>
-                      <td>#${order.display_id}</td>
-                      <td>${new Date(order.created_at).toLocaleDateString('it-IT')}</td>
-                      <td>${formatPrice(order.total, order.currency_code)}</td>
-                      <td><span class="status-badge ${order.status}">${order.status}</span></td>
-                    </tr>
-                  `,
-                    )
-                    .join('')}
-                </tbody>
-              </table>
+          <section class="account-overview">
+            <div class="overview-card">
+              <h2>${t('account.recent_orders') || 'Ordini Recenti'}</h2>
+              ${
+                orders.length === 0
+                  ? `
+                <p role="status" class="empty-state">${t('account.no_orders')}</p>
+              `
+                  : `
+                <div class="orders-list">
+                  ${orders.slice(0, 5).map(order => `
+                    <div class="order-item-card">
+                      <div class="order-meta">
+                        <span class="order-id">#${order.display_id}</span>
+                        <span class="order-date">${new Date(order.created_at).toLocaleDateString('it-IT')}</span>
+                      </div>
+                      <div class="order-details">
+                        <span class="order-total">${formatPrice(order.total, order.currency_code)}</span>
+                        <span class="status-badge ${order.status}">${order.status}</span>
+                      </div>
+                      <a href="/account/orders/${order.id}" class="view-order-link" data-link>${t('account.view_details') || 'Vedi dettagli'}</a>
+                    </div>
+                  `).join('')}
+                </div>
+                ${orders.length > 5 ? `<a href="/account/orders" class="see-all-link" data-link>${t('account.see_all_orders') || 'Vedi tutti gli ordini'}</a>` : ''}
+              `
+              }
             </div>
-          `
-          }
-        </section>
-      </main>
+
+            <div class="overview-grid">
+              <div class="overview-card">
+                <h2>${t('account.profile_info') || 'Informazioni Profilo'}</h2>
+                <p><strong>${t('auth.email')}:</strong> ${user?.email}</p>
+                <p><strong>${t('auth.first_name')}:</strong> ${user?.first_name}</p>
+                <p><strong>${t('auth.last_name')}:</strong> ${user?.last_name}</p>
+                <a href="/account/profile" class="edit-link" data-link>${t('common.edit') || 'Modifica'}</a>
+              </div>
+              
+              <div class="overview-card">
+                <h2>${t('account.addresses') || 'Indirizzi'}</h2>
+                <p>${t('account.manage_addresses_desc') || 'Gestisci i tuoi indirizzi di spedizione e fatturazione per un checkout più veloce.'}</p>
+                <a href="/account/addresses" class="manage-link" data-link>${t('account.manage_addresses') || 'Gestisci indirizzi'}</a>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
     `;
 
     return { html, title: `${t('account.title')} | Medusa Store` };
@@ -99,8 +119,12 @@ export const initAccount = () => {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
-      await authStore.logout();
-      navigate('/login');
+      try {
+        await authStore.logout();
+        navigate('/login');
+      } catch (error) {
+        console.error('Logout failed:', error);
+      }
     });
   }
 

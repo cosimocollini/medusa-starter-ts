@@ -7,9 +7,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  // Altre configurazioni utili per Medusa (es. port, server proxy se necessario)
+  ssr: {
+    noExternal: ['@medusajs/js-sdk'],
+  },
   server: {
-    port: 3000,
+    port: 8000,
     open: true,
   },
 });

@@ -1,5 +1,4 @@
-import { medusa } from '@/api/client';
-import type { Product } from '@/api/types';
+import { sdk } from '@/api/client';
 import { t } from '@/utils/i18n';
 
 /**
@@ -12,10 +11,9 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
   if (!handle) return { html: `<p>${t('common.error')}</p>`, title: t('common.error') };
 
   try {
-    const { products } = await medusa.get<{ products: Product[] }>(
-      `/store/products?handle=${handle}`,
-    );
-    const product = products[0];
+    // Recupera il prodotto usando l'SDK ufficiale
+    const { products } = await sdk.store.product.list({ handle });
+    const product: any = products[0];
 
     if (!product) return { html: `<p>Prodotto non trovato</p>`, title: 'Prodotto non trovato' };
 
@@ -26,6 +24,8 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
     }
 
     // Price formatting (using first variant price)
+    // Nota: L'SDK di Medusa v2 fornisce prezzi già calcolati se passiamo il region_id, 
+    // per ora manteniamo la logica base ma predisposta.
     const price = product.variants?.[0]?.prices?.[0];
     const formattedPrice = price
       ? new Intl.NumberFormat('it-IT', {
@@ -38,14 +38,15 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
     const html = `
       <main class="product-detail-container">
         <nav aria-label="Breadcrumb">
-          <a href="/" data-link>${t('product.back')}</a>
+          <a href="/" data-link aria-label="Torna al catalogo">${t('product.back')}</a>
         </nav>
         
         <article class="product-layout" itemscope itemtype="https://schema.org/Product">
           <div class="product-gallery">
             <img 
               src="${product.thumbnail}" 
-              alt="${product.title}" 
+              alt="" 
+              role="presentation"
               itemprop="image"
               aria-describedby="product-desc"
             />
@@ -56,6 +57,7 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
             <p class="price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
               <span itemprop="priceCurrency" content="${currencyCode}">${formattedPrice}</span>
               <meta itemprop="price" content="${price ? price.amount / 100 : '0'}" />
+              <link itemprop="availability" href="https://schema.org/InStock" />
             </p>
             
             <section class="product-variants" aria-labelledby="variants-label">
@@ -63,11 +65,13 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
               <div class="variant-grid">
                 ${product.variants
                   .map(
-                    (v, i) => `
+                    (v: any, i: number) => `
                   <button 
                     class="variant-btn ${i === 0 ? 'selected' : ''}" 
                     data-variant-id="${v.id}"
                     aria-pressed="${i === 0}"
+                    aria-label="Seleziona variante ${v.title}"
+                    style="min-height: 44px;"
                   >
                     ${v.title}
                   </button>
@@ -77,13 +81,13 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
               </div>
             </section>
             
-            <button class="add-to-cart primary-btn" id="add-to-cart-btn">
+            <button class="add-to-cart primary-btn" id="add-to-cart-btn" aria-live="polite">
               ${t('cart.add_to_cart')}
             </button>
             
             <section class="product-description" id="product-desc">
               <h2>${t('product.description')}</h2>
-              <div itemprop="description">${product.description}</div>
+              <div itemprop="description">${product.description || 'Nessuna descrizione disponibile.'}</div>
             </section>
           </div>
         </article>
@@ -93,7 +97,7 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
     return { html, title };
   } catch (error) {
     console.error('Error loading product details:', error);
-    return { html: `<div class="error-msg">${t('common.error')}</div>`, title: t('common.error') };
+    return { html: `<div class="error-msg" role="alert">${t('common.error')}</div>`, title: t('common.error') };
   }
 };
 

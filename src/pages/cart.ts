@@ -43,7 +43,7 @@ export const renderCart = async () => {
             </tr>
           </thead>
           <tbody>
-            ${cart.items.map(item => `
+            ${cart.items.map((item: any) => `
               <tr data-item-id="${item.id}">
                 <td class="item-info">
                   <div class="item-details">
@@ -92,10 +92,10 @@ export const renderCart = async () => {
           <h2 id="summary-heading">${t('cart.subtotal')}</h2>
           <div class="summary-row">
             <span>${t('cart.subtotal')}</span>
-            <span class="total-amount">${formatPrice(cart.total)}</span>
+            <span class="total-amount" aria-live="polite" aria-atomic="true">${formatPrice(cart.total)}</span>
           </div>
-          <button class="checkout-btn primary-btn">${t('cart.checkout')}</button>
-          <a href="/" data-link class="back-to-store">${t('cart.continue_shopping')}</a>
+          <button class="checkout-btn primary-btn" style="min-height: 44px;">${t('cart.checkout')}</button>
+          <a href="/" data-link class="back-to-store" style="display: inline-block; min-height: 44px; padding-top: 12px;">${t('cart.continue_shopping')}</a>
         </aside>
       </div>
     </div>

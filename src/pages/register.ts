@@ -3,45 +3,84 @@ import { navigate } from '@/router';
 import { t } from '@/utils/i18n';
 
 /**
- * Renders the registration page with an accessible form (WCAG).
+ * Renders the registration page with an accessible form (WCAG 2.1).
  */
 export const renderRegister = async () => {
   const html = `
     <div class="auth-container">
-      <h1 id="register-heading">${t('auth.register_title')}</h1>
-      
-      <form id="register-form" class="auth-form" aria-labelledby="register-heading">
-        <div class="form-grid">
-          <div class="form-group half">
-            <label for="first_name">${t('auth.first_name')}</label>
-            <input type="text" id="first_name" name="first_name" required autocomplete="given-name" />
-          </div>
-          
-          <div class="form-group half">
-            <label for="last_name">${t('auth.last_name')}</label>
-            <input type="text" id="last_name" name="last_name" required autocomplete="family-name" />
+      <div class="auth-card">
+        <h1 id="register-heading" class="auth-title">${t('auth.register_title')}</h1>
+        <p class="auth-subtitle">${t('auth.register_subtitle') || 'Crea un account per velocizzare il checkout e tracciare i tuoi ordini'}</p>
+        
+        <form id="register-form" class="auth-form" aria-labelledby="register-heading" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name" class="form-label">${t('auth.first_name')}</label>
+              <input 
+                type="text" 
+                id="first_name" 
+                name="first_name" 
+                class="form-input"
+                required 
+                autocomplete="given-name" 
+                placeholder="Mario"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label for="last_name" class="form-label">${t('auth.last_name')}</label>
+              <input 
+                type="text" 
+                id="last_name" 
+                name="last_name" 
+                class="form-input"
+                required 
+                autocomplete="family-name" 
+                placeholder="Rossi"
+              />
+            </div>
           </div>
           
           <div class="form-group">
-            <label for="email">${t('auth.email')}</label>
-            <input type="email" id="email" name="email" required autocomplete="email" />
+            <label for="email" class="form-label">${t('auth.email')}</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              class="form-input"
+              required 
+              autocomplete="email" 
+              placeholder="email@example.com"
+            />
           </div>
           
           <div class="form-group">
-            <label for="password">${t('auth.password')}</label>
-            <input type="password" id="password" name="password" required autocomplete="new-password" minlength="8" />
+            <label for="password" class="form-label">${t('auth.password')}</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-input"
+              required 
+              autocomplete="new-password" 
+              minlength="8" 
+              placeholder="••••••••"
+              aria-describedby="password-hint"
+            />
+            <small id="password-hint" class="form-hint">${t('auth.password_hint') || 'Almeno 8 caratteri'}</small>
           </div>
+          
+          <div id="register-error" class="error-box" role="alert" aria-live="polite"></div>
+          
+          <button type="submit" class="submit-btn primary-btn">
+            ${t('auth.register_title')}
+          </button>
+        </form>
+        
+        <div class="auth-footer">
+          <p>${t('auth.already_have_account_prompt') || 'Hai già un account?'}</p>
+          <a href="/login" class="auth-link" data-link>${t('common.login')}</a>
         </div>
-        
-        <div id="register-error" class="error-box" role="alert" aria-live="polite"></div>
-        
-        <button type="submit" class="submit-btn primary-btn">
-          ${t('auth.register_title')}
-        </button>
-      </form>
-      
-      <div class="auth-footer">
-        <a href="/login" data-link>${t('auth.already_have_account')}</a>
       </div>
     </div>
   `;
@@ -65,6 +104,17 @@ export const initRegister = () => {
     
     const submitBtn = form.querySelector('.submit-btn') as HTMLButtonElement;
     
+    // Basic validation
+    if (!data.email || !data.password || !data.first_name || !data.last_name) {
+      if (errorBox) errorBox.textContent = t('auth.fields_required') || 'Tutti i campi sono obbligatori';
+      return;
+    }
+
+    if ((data.password as string).length < 8) {
+      if (errorBox) errorBox.textContent = t('auth.password_too_short') || 'La password deve essere di almeno 8 caratteri';
+      return;
+    }
+    
     try {
       submitBtn.disabled = true;
       submitBtn.textContent = t('common.loading');
@@ -72,8 +122,10 @@ export const initRegister = () => {
 
       await authStore.register(data);
       navigate('/account');
-    } catch (error) {
-      if (errorBox) errorBox.textContent = t('auth.register_failed');
+    } catch (error: any) {
+      if (errorBox) {
+        errorBox.textContent = error.message || t('auth.register_failed');
+      }
       submitBtn.disabled = false;
       submitBtn.textContent = t('auth.register_title');
     }

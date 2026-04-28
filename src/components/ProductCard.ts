@@ -8,17 +8,20 @@ export const ProductCard = (product: Product) => {
     : 'Prezzo non disponibile';
 
   return `
-    <div class="product-card" data-id="${product.id}">
-      <a href="/products/${product.handle}" data-link>
-        <img src="${product.thumbnail || '/placeholder.png'}" alt="${product.title}" loading="lazy" />
+    <article class="product-card" data-id="${product.id}" aria-labelledby="title-${product.id}">
+      <a href="/products/${product.handle}" data-link aria-label="Visualizza dettagli per ${product.title}">
+        <img src="${product.thumbnail || '/placeholder.png'}" alt="" role="presentation" loading="lazy" />
         <div class="product-info">
-          <h3>${product.title}</h3>
-          <p class="price">${formattedPrice}</p>
+          <h3 id="title-${product.id}">${product.title}</h3>
+          <p class="price" aria-label="Prezzo: ${formattedPrice}">${formattedPrice}</p>
         </div>
       </a>
-      <button class="add-to-cart" data-variant-id="${product.variants?.[0]?.id}">
+      <button class="add-to-cart" 
+              data-variant-id="${product.variants?.[0]?.id}"
+              aria-label="Aggiungi ${product.title} al carrello"
+              style="min-height: 44px; min-width: 44px;">
         Aggiungi al carrello
       </button>
-    </div>
+    </article>
   `;
 };

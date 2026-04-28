@@ -1,4 +1,4 @@
-import { medusa } from '@/api/client';
+import { sdk } from '@/api/client';
 
 export interface Customer {
   id: string;
@@ -8,9 +8,8 @@ export interface Customer {
 }
 
 /**
- * AuthStore manages the Medusa customer session.
- * It uses the session cookies automatically handled by the browser 
- * through the 'credentials: include' fetch setting.
+ * AuthStore manages the Medusa customer session using the JS SDK.
+ * Medusa 2.0 uses JWT for authentication by default.
  */
 class AuthStore {
   private customer: Customer | null = null;
@@ -25,10 +24,10 @@ class AuthStore {
    */
   async checkSession() {
     try {
-      const { customer } = await medusa.get<{ customer: Customer }>('/store/auth');
-      this.customer = customer;
+      const { customer } = await sdk.store.customer.retrieve();
+      this.customer = customer as Customer;
     } catch (error) {
-      // Not authenticated
+      // Not authenticated or session expired
       this.customer = null;
     } finally {
       this.isLoaded = true;
@@ -38,17 +37,20 @@ class AuthStore {
 
   /**
    * Logs in a customer using email and password.
-   * On success, Medusa returns a session cookie.
+   * Medusa 2.0 auth flow: login returns a JWT which the SDK stores automatically.
    */
   async login(email: string, password: string): Promise<Customer> {
     try {
-      const { customer } = await medusa.post<{ customer: Customer }>('/store/auth', {
+      await sdk.auth.login('customer', 'emailpass', {
         email,
         password
       });
-      this.customer = customer;
+      
+      // After login, retrieve the customer profile
+      const { customer } = await sdk.store.customer.retrieve();
+      this.customer = customer as Customer;
       this.dispatchUpdate();
-      return customer;
+      return this.customer;
     } catch (error) {
       this.customer = null;
       throw error;
@@ -56,11 +58,11 @@ class AuthStore {
   }
 
   /**
-   * Clears the current session on the backend and locally.
+   * Clears the current session.
    */
   async logout() {
     try {
-      await medusa.delete('/store/auth');
+      await sdk.auth.logout();
     } finally {
       this.customer = null;
       this.dispatchUpdate();
@@ -69,13 +71,26 @@ class AuthStore {
 
   /**
    * Registers a new customer on the Medusa backend.
+   * Medusa 2.0: 1. register identity, 2. create customer profile.
    */
   async register(data: any): Promise<Customer> {
     try {
-      const { customer } = await medusa.post<{ customer: Customer }>('/store/customers', data);
-      this.customer = customer;
+      // Step 1: Register the identity with email/pass provider
+      await sdk.auth.register('customer', 'emailpass', {
+        email: data.email,
+        password: data.password
+      });
+
+      // Step 2: Create the customer profile
+      const { customer } = await sdk.store.customer.create({
+        email: data.email,
+        first_name: data.first_name,
+        last_name: data.last_name
+      });
+
+      this.customer = customer as Customer;
       this.dispatchUpdate();
-      return customer;
+      return this.customer;
     } catch (error) {
       this.customer = null;
       throw error;
@@ -88,7 +103,8 @@ class AuthStore {
   async getOrders(): Promise<any[]> {
     if (!this.customer) return [];
     try {
-      const { orders } = await medusa.get<{ orders: any[] }>('/store/customers/me/orders');
+      // Medusa 2.0: sdk.store.order.list() returns orders for the authenticated customer
+      const { orders } = await sdk.store.order.list();
       return orders;
     } catch (error) {
       console.error('Error fetching orders:', error);

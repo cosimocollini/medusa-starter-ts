@@ -1,4 +1,19 @@
-import { MEDUSA_BACKEND_URL } from './config';
+// @ts-ignore
+import MedusaSDK from '@medusajs/js-sdk';
+import { MEDUSA_BACKEND_URL, MEDUSA_PUBLISHABLE_KEY } from './config';
+
+//(Vite vs Node/tsx)
+const Medusa = (MedusaSDK as any).default || MedusaSDK;
+
+/**
+ * Official Medusa SDK Instance.
+ * We'll gradually migrate all API calls to use this.
+ */
+export const sdk = new Medusa({
+  baseUrl: MEDUSA_BACKEND_URL,
+  publishableKey: MEDUSA_PUBLISHABLE_KEY,
+  debug: true,
+});
 
 export interface RequestOptions extends RequestInit {
   idempotencyKey?: string;
@@ -31,10 +46,7 @@ export const request = async <T>(
 
   const headers = new Headers(fetchOptions.headers || {});
   headers.set('Content-Type', 'application/json');
-  headers.set(
-    'x-publishable-api-key',
-    'pk_2480e23811f659fd2115530422e5363a8376f099cbac1477a250bddf4c0375e5',
-  );
+  headers.set('x-publishable-api-key', MEDUSA_PUBLISHABLE_KEY);
 
   // Add Idempotency-Key for POST
   if (fetchOptions.method === 'POST' && idempotencyKey) {

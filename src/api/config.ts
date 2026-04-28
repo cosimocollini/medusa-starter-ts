@@ -18,6 +18,12 @@ const getEnv = (key: string, defaultValue: string): string => {
 export const MEDUSA_BACKEND_URL = getEnv('VITE_MEDUSA_BACKEND_URL', 'http://localhost:9000');
 
 /**
+ * Medusa Publishable API Key.
+ * Set VITE_MEDUSA_PUBLISHABLE_KEY in .env file.
+ */
+export const MEDUSA_PUBLISHABLE_KEY = getEnv('VITE_MEDUSA_PUBLISHABLE_KEY', 'pk_2480e23811f659fd2115530422e5363a8376f099cbac1477a250bddf4c0375e5');
+
+/**
  * Stripe Public Key.
  * Set VITE_STRIPE_PUBLIC_KEY in .env file (format: pk_test_...).
  * If not provided, Stripe features will operate in placeholder mode.

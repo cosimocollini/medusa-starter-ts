@@ -5,6 +5,7 @@ import { renderLogin, initLogin } from '@/pages/login';
 import { renderRegister, initRegister } from '@/pages/register';
 import { renderAccount, initAccount } from '@/pages/account';
 import { cartStore } from '@/store/cart';
+import { renderNavbar } from '@/components/Navbar';
 
 import { renderProductDetail, initProductDetail } from '@/pages/product';
 
@@ -99,10 +100,22 @@ if (typeof window !== 'undefined') {
 
   // Inizializza l'app al caricamento del DOM
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Se la navbar non è presente (es. siamo in dev mode), la iniettiamo ora
+      if (!document.querySelector('.global-nav')) {
+        const navHtml = await renderNavbar();
+        document.body.insertAdjacentHTML('afterbegin', navHtml);
+      }
       handleRoute();
     });
   } else {
-    handleRoute();
+    // Caso in cui il DOM è già pronto
+    (async () => {
+      if (!document.querySelector('.global-nav')) {
+        const navHtml = await renderNavbar();
+        document.body.insertAdjacentHTML('afterbegin', navHtml);
+      }
+      handleRoute();
+    })();
   }
 }
