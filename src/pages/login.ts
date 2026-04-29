@@ -1,6 +1,7 @@
 import { authStore } from '@/store/auth';
 import { navigate } from '@/router';
 import { t } from '@/utils/i18n';
+import { getIcon } from '@/utils/icons';
 
 /**
  * Renders the login page template with accessible form.
@@ -8,10 +9,15 @@ import { t } from '@/utils/i18n';
  */
 export const renderLogin = async () => {
   const html = `
-    <div class="auth-container">
+    <main class="auth-container">
       <div class="auth-card">
-        <h1 id="login-heading" class="auth-title">${t('common.login')}</h1>
-        <p class="auth-subtitle">${t('auth.login_subtitle') || 'Accedi al tuo account per gestire i tuoi ordini'}</p>
+        <header class="auth-header">
+          <div class="auth-icon-wrapper">
+            ${getIcon({ name: 'user', size: 'lg' })}
+          </div>
+          <h1 id="login-heading" class="auth-title">${t('common.login')}</h1>
+          <p class="auth-subtitle">${t('auth.login_subtitle')}</p>
+        </header>
         
         <form id="login-form" class="auth-form" aria-labelledby="login-heading" novalidate>
           <div class="form-group">
@@ -42,19 +48,19 @@ export const renderLogin = async () => {
             />
           </div>
           
-          <div id="login-error" class="error-box" role="alert" aria-live="polite"></div>
+          <div id="login-error" class="error-box auth-error hidden" role="alert" aria-live="polite"></div>
           
-          <button type="submit" class="submit-btn primary-btn">
+          <button type="submit" id="login-submit-btn" class="btn btn--primary btn--full">
             ${t('auth.submit')}
           </button>
         </form>
         
-        <div class="auth-footer">
-          <p>${t('auth.no_account_prompt') || 'Non hai ancora un account?'}</p>
+        <footer class="auth-footer">
+          <p>${t('auth.no_account_prompt')}</p>
           <a href="/register" class="auth-link" data-link>${t('auth.register_title')}</a>
-        </div>
+        </footer>
       </div>
-    </div>
+    </main>
   `;
 
   return { html, title: `${t('common.login')} | Medusa Store` };
@@ -67,27 +73,27 @@ export const renderLogin = async () => {
 export const initLogin = () => {
   const form = document.getElementById('login-form') as HTMLFormElement;
   const errorBox = document.getElementById('login-error');
+  const submitBtn = document.getElementById('login-submit-btn') as HTMLButtonElement;
   
   if (!form) return;
   
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     const formData = new FormData(form);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     
-    const submitBtn = form.querySelector('.submit-btn') as HTMLButtonElement;
-    
-    // Basic validation
-    if (!email || !password) {
-      if (errorBox) errorBox.textContent = t('auth.fields_required') || 'Tutti i campi sono obbligatori';
-      return;
-    }
-    
     try {
       submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
       submitBtn.textContent = t('common.loading');
-      if (errorBox) errorBox.textContent = '';
+      errorBox?.classList.add('hidden');
 
       await authStore.login(email, password);
       
@@ -96,6 +102,7 @@ export const initLogin = () => {
     } catch (error: any) {
       if (errorBox) {
         errorBox.textContent = error.message || t('auth.login_failed');
+        errorBox.classList.remove('hidden');
       }
       submitBtn.disabled = false;
       submitBtn.textContent = t('auth.submit');

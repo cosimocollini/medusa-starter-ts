@@ -1,19 +1,25 @@
 import { authStore } from '@/store/auth';
 import { navigate } from '@/router';
 import { t } from '@/utils/i18n';
+import { getIcon } from '@/utils/icons';
 
 /**
  * Renders the registration page with an accessible form (WCAG 2.1).
  */
 export const renderRegister = async () => {
   const html = `
-    <div class="auth-container">
+    <main class="auth-container">
       <div class="auth-card">
-        <h1 id="register-heading" class="auth-title">${t('auth.register_title')}</h1>
-        <p class="auth-subtitle">${t('auth.register_subtitle') || 'Crea un account per velocizzare il checkout e tracciare i tuoi ordini'}</p>
+        <header class="auth-header">
+          <div class="auth-icon-wrapper">
+            ${getIcon({ name: 'user', size: 'lg' })}
+          </div>
+          <h1 id="register-heading" class="auth-title">${t('auth.register_title')}</h1>
+          <p class="auth-subtitle">${t('auth.register_subtitle')}</p>
+        </header>
         
         <form id="register-form" class="auth-form" aria-labelledby="register-heading" novalidate>
-          <div class="form-row">
+          <div class="form-grid">
             <div class="form-group">
               <label for="first_name" class="form-label">${t('auth.first_name')}</label>
               <input 
@@ -67,22 +73,22 @@ export const renderRegister = async () => {
               placeholder="••••••••"
               aria-describedby="password-hint"
             />
-            <small id="password-hint" class="form-hint">${t('auth.password_hint') || 'Almeno 8 caratteri'}</small>
+            <small id="password-hint" class="form-hint">${t('auth.password_hint')}</small>
           </div>
           
-          <div id="register-error" class="error-box" role="alert" aria-live="polite"></div>
+          <div id="register-error" class="error-box auth-error hidden" role="alert" aria-live="polite"></div>
           
-          <button type="submit" class="submit-btn primary-btn">
+          <button type="submit" id="register-submit-btn" class="btn btn--primary btn--full">
             ${t('auth.register_title')}
           </button>
         </form>
         
-        <div class="auth-footer">
-          <p>${t('auth.already_have_account_prompt') || 'Hai già un account?'}</p>
+        <footer class="auth-footer">
+          <p>${t('auth.already_have_account_prompt')}</p>
           <a href="/login" class="auth-link" data-link>${t('common.login')}</a>
-        </div>
+        </footer>
       </div>
-    </div>
+    </main>
   `;
 
   return { html, title: `${t('auth.register_title')} | Medusa Store` };
@@ -94,37 +100,41 @@ export const renderRegister = async () => {
 export const initRegister = () => {
   const form = document.getElementById('register-form') as HTMLFormElement;
   const errorBox = document.getElementById('register-error');
+  const submitBtn = document.getElementById('register-submit-btn') as HTMLButtonElement;
   
   if (!form) return;
   
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData);
     
-    const submitBtn = form.querySelector('.submit-btn') as HTMLButtonElement;
-    
-    // Basic validation
-    if (!data.email || !data.password || !data.first_name || !data.last_name) {
-      if (errorBox) errorBox.textContent = t('auth.fields_required') || 'Tutti i campi sono obbligatori';
+    if (!form.checkValidity()) {
+      form.reportValidity();
       return;
     }
 
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
     if ((data.password as string).length < 8) {
-      if (errorBox) errorBox.textContent = t('auth.password_too_short') || 'La password deve essere di almeno 8 caratteri';
+      if (errorBox) {
+        errorBox.textContent = t('auth.password_too_short');
+        errorBox.classList.remove('hidden');
+      }
       return;
     }
     
     try {
       submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
       submitBtn.textContent = t('common.loading');
-      if (errorBox) errorBox.textContent = '';
+      errorBox?.classList.add('hidden');
 
       await authStore.register(data);
       navigate('/account');
     } catch (error: any) {
       if (errorBox) {
         errorBox.textContent = error.message || t('auth.register_failed');
+        errorBox.classList.remove('hidden');
       }
       submitBtn.disabled = false;
       submitBtn.textContent = t('auth.register_title');
