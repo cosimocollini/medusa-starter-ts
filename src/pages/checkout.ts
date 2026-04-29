@@ -3,6 +3,7 @@ import { authStore } from '@/store/auth';
 import { t } from '@/utils/i18n';
 import { navigate } from '@/router';
 import { STRIPE_PUBLIC_KEY } from '@/api/config';
+import { getIcon } from '@/utils/icons';
 
 // Stripe instances
 let stripe: any = null;
@@ -29,18 +30,28 @@ export const renderCheckout = async () => {
 
   const user = authStore.currentUser;
 
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('it-IT', { 
+      style: 'currency', 
+      currency: 'EUR' 
+    }).format(amount / 100);
+  };
+
   const html = `
     <main class="checkout-container">
-      <h1 id="checkout-heading">${t('checkout.title')}</h1>
+      <h1 class="checkout-title" id="checkout-heading">${t('checkout.title')}</h1>
       
       <div class="checkout-layout">
-        <form id="checkout-form" class="checkout-form" aria-labelledby="checkout-heading">
+        <form id="checkout-form" class="checkout-form" aria-labelledby="checkout-heading" novalidate>
           <!-- Step 1: Shipping Address -->
           <section class="checkout-section" aria-labelledby="shipping-label">
-            <h2 id="shipping-label">${t('checkout.shipping_address')}</h2>
+            <h2 id="shipping-label" class="checkout-section__title">
+              ${getIcon({ name: 'user', size: 'sm' })}
+              ${t('checkout.shipping_address')}
+            </h2>
             
             <div class="form-grid">
-              <div class="form-group">
+              <div class="form-group full-width">
                 <label for="email" class="form-label">${t('checkout.email')}</label>
                 <input 
                   type="email" 
@@ -54,7 +65,7 @@ export const renderCheckout = async () => {
                 />
               </div>
               
-              <div class="form-group half">
+              <div class="form-group">
                 <label for="first_name" class="form-label">${t('checkout.first_name')}</label>
                 <input 
                   type="text" 
@@ -68,7 +79,7 @@ export const renderCheckout = async () => {
                 />
               </div>
               
-              <div class="form-group half">
+              <div class="form-group">
                 <label for="last_name" class="form-label">${t('checkout.last_name')}</label>
                 <input 
                   type="text" 
@@ -82,27 +93,27 @@ export const renderCheckout = async () => {
                 />
               </div>
               
-              <div class="form-group">
+              <div class="form-group full-width">
                 <label for="address_1" class="form-label">${t('checkout.address')}</label>
                 <input type="text" id="address_1" name="address_1" class="form-input" required autocomplete="shipping street-address" aria-required="true" />
               </div>
               
-              <div class="form-group half">
+              <div class="form-group">
                 <label for="city" class="form-label">${t('checkout.city')}</label>
                 <input type="text" id="city" name="city" class="form-input" required autocomplete="shipping address-level2" aria-required="true" />
               </div>
               
-              <div class="form-group half">
+              <div class="form-group">
                 <label for="postal_code" class="form-label">${t('checkout.postal_code')}</label>
                 <input type="text" id="postal_code" name="postal_code" class="form-input" required autocomplete="shipping postal-code" aria-required="true" />
               </div>
 
-              <div class="form-group half">
+              <div class="form-group">
                 <label for="country_code" class="form-label">${t('checkout.country_code')}</label>
                 <input type="text" id="country_code" name="country_code" class="form-input" required placeholder="IT" aria-required="true" />
               </div>
 
-              <div class="form-group half">
+              <div class="form-group">
                 <label for="phone" class="form-label">${t('checkout.phone')}</label>
                 <input type="tel" id="phone" name="phone" class="form-input" autocomplete="tel" />
               </div>
@@ -111,9 +122,12 @@ export const renderCheckout = async () => {
 
           <!-- Step 2: Shipping Method (Dynamic) -->
           <section id="shipping-methods-section" class="checkout-section" aria-labelledby="methods-label" hidden>
-            <fieldset id="shipping-options-fieldset" class="options-list">
-              <legend id="methods-label"><h2 style="margin: 0; font-size: inherit;">${t('checkout.shipping_method')}</h2></legend>
-              <div id="shipping-options-list" class="options-list">
+            <fieldset id="shipping-options-fieldset" class="option-list">
+              <legend id="methods-label" class="checkout-section__title">
+                ${getIcon({ name: 'home', size: 'sm' })}
+                ${t('checkout.shipping_method')}
+              </legend>
+              <div id="shipping-options-list" class="option-list">
                 <!-- Loaded dynamically after address is set -->
               </div>
             </fieldset>
@@ -121,26 +135,33 @@ export const renderCheckout = async () => {
 
           <!-- Step 3: Payment (Stripe) -->
           <section id="payment-section" class="checkout-section" aria-labelledby="payment-label" hidden>
-            <h2 id="payment-label">${t('checkout.payment')}</h2>
+            <h2 id="payment-label" class="checkout-section__title">
+              ${getIcon({ name: 'cart', size: 'sm' })}
+              ${t('checkout.payment')}
+            </h2>
             <div id="stripe-element-container" class="stripe-mount-point">
               <!-- Stripe Elements will be mounted here -->
               ${!STRIPE_PUBLIC_KEY ? '<p class="placeholder-msg">Stripe Payment Element Placeholder (Set API key in .env to activate)</p>' : '<div id="payment-element"></div>'}
             </div>
           </section>
 
-          <div id="checkout-error" class="error-box" role="alert" aria-live="polite"></div>
+          <div id="checkout-error" class="error-box hidden" role="alert" aria-live="polite"></div>
 
-          <button type="submit" id="submit-order-btn" class="primary-btn checkout-submit" style="min-height: 44px;">
+          <button type="submit" id="submit-order-btn" class="btn btn--primary btn--full checkout-submit">
             ${t('checkout.complete_order')}
           </button>
         </form>
 
         <!-- Summary -->
         <aside class="order-summary" aria-label="Order summary">
-          <h3>Riepilogo</h3>
-          <div class="summary-total">
+          <h2 class="order-summary__title">Riepilogo</h2>
+          <div class="summary-row">
+            <span>Subtotale</span>
+            <span>${formatPrice(cart.total)}</span>
+          </div>
+          <div class="summary-row summary-total">
             <span>Totale</span>
-            <span>${new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(cart.total / 100)}</span>
+            <span aria-live="polite" aria-atomic="true">${formatPrice(cart.total)}</span>
           </div>
         </aside>
       </div>
@@ -167,6 +188,13 @@ export const initCheckout = () => {
   if (STRIPE_PUBLIC_KEY && window.Stripe) {
     stripe = window.Stripe(STRIPE_PUBLIC_KEY);
   }
+
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('it-IT', { 
+      style: 'currency', 
+      currency: 'EUR' 
+    }).format(amount / 100);
+  };
 
   // Logic to load shipping options after address input
   const inputs = form.querySelectorAll('input');
@@ -208,7 +236,10 @@ export const initCheckout = () => {
     list.innerHTML = options.map(opt => `
       <label class="option-item">
         <input type="radio" name="shipping_option" value="${opt.id}" required />
-        <span class="option-label">${opt.name} - ${new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(opt.amount / 100)}</span>
+        <div class="option-info">
+          <span class="option-name">${opt.name}</span>
+          <span class="option-price">${formatPrice(opt.amount)}</span>
+        </div>
       </label>
     `).join('');
 
@@ -241,8 +272,16 @@ export const initCheckout = () => {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
     submitBtn.textContent = t('checkout.processing');
+    errorBox?.classList.add('hidden');
 
     try {
       // 1. Stripe Payment Confirmation (if SDK is active)
@@ -270,9 +309,12 @@ export const initCheckout = () => {
         throw new Error('Order incomplete on server side.');
       }
     } catch (error: any) {
-      if (errorBox) errorBox.textContent = error.message || t('checkout.error');
+      if (errorBox) {
+        errorBox.textContent = error.message || t('checkout.error');
+        errorBox.classList.remove('hidden');
+      }
       submitBtn.disabled = false;
-      submitBtn.textContent = t('checkout.complete_order');
+      submitBtn.textContent = originalText;
     }
   });
 };

@@ -81,7 +81,7 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
               </div>
             </section>
             
-            <button class="add-to-cart primary-btn" id="add-to-cart-btn" aria-live="polite">
+            <button class="add-to-cart primary-btn" id="add-to-cart-btn" aria-live="polite" data-variant-id="${product.variants[0]?.id}">
               ${t('cart.add_to_cart')}
             </button>
             
@@ -109,9 +109,6 @@ export const initProductDetail = () => {
   const cartBtn = document.getElementById(
     'add-to-cart-btn',
   ) as HTMLButtonElement;
-  let selectedVariantId = document
-    .querySelector('.variant-btn.selected')
-    ?.getAttribute('data-variant-id');
 
   // Handle variant selection for accessibility and UI feedback
   variantBtns.forEach((btn) => {
@@ -122,23 +119,10 @@ export const initProductDetail = () => {
       });
       btn.classList.add('selected');
       btn.setAttribute('aria-pressed', 'true');
-      selectedVariantId = btn.getAttribute('data-variant-id');
+      const selectedVariantId = btn.getAttribute('data-variant-id');
+      if (cartBtn && selectedVariantId) {
+        cartBtn.setAttribute('data-variant-id', selectedVariantId);
+      }
     });
   });
-
-  // Attach add-to-cart listener for this specific page context
-  if (cartBtn) {
-    cartBtn.onclick = async () => {
-      if (!selectedVariantId) return;
-
-      cartBtn.textContent = t('cart.adding');
-      cartBtn.disabled = true;
-
-      // The global 'add-to-cart' logic in main.ts will also pick up
-      // clicks on elements with the '.add-to-cart' class if we wanted,
-      // but here we can add page-specific behavior if needed.
-      // Re-using the class logic for simplicity:
-      cartBtn.setAttribute('data-variant-id', selectedVariantId);
-    };
-  }
 };

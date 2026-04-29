@@ -12,4 +12,6 @@
 @import "./components/Navbar.css";
 @import "./components/ProductCard.css";
 @import "./components/Icon.css";
+@import "./components/Cart.css";
+@import "./components/Checkout.css";
 

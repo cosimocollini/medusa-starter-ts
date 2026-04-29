@@ -68,10 +68,13 @@ if (typeof window !== 'undefined') {
    * Global listener for 'Add to Cart' clicks.
    */
   document.addEventListener('click', async (e) => {
-    const target = e.target as HTMLElement;
+    const target = (e.target as HTMLElement).closest('[data-variant-id]') as HTMLElement;
+    if (!target || target.classList.contains('variant-btn')) return;
+
     const variantId = target.getAttribute('data-variant-id');
     if (variantId) {
       try {
+        const originalText = target.textContent;
         target.textContent = 'Aggiungendo...';
         target.setAttribute('disabled', 'true');
 
@@ -79,12 +82,11 @@ if (typeof window !== 'undefined') {
 
         target.textContent = 'Aggiunto!';
         setTimeout(() => {
-          target.textContent = 'Aggiungi al carrello';
+          target.textContent = originalText;
           target.removeAttribute('disabled');
         }, 2000);
       } catch (error) {
         alert("Errore nell'aggiunta al carrello. Riprova.");
-        target.textContent = 'Aggiungi al carrello';
         target.removeAttribute('disabled');
       }
     }

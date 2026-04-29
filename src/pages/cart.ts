@@ -1,6 +1,7 @@
 import { cartStore } from '@/store/cart';
 import { t } from '@/utils/i18n';
 import { handleRoute } from '@/router';
+import { getIcon } from '@/utils/icons';
 
 /**
  * Renders the cart page.
@@ -11,10 +12,13 @@ export const renderCart = async () => {
 
   if (!cart || cart.items.length === 0) {
     const html = `
-      <div class="cart-container empty">
-        <h1>${t('cart.title')}</h1>
-        <p role="status">${t('cart.empty')}</p>
-        <a href="/" data-link class="continue-shopping">${t('cart.continue_shopping')}</a>
+      <div class="cart-container empty-cart">
+        <div class="empty-cart__icon">
+          ${getIcon({ name: 'cart', size: 'lg' })}
+        </div>
+        <h1 class="cart-title">${t('cart.title')}</h1>
+        <p role="status" class="text-muted mb-4">${t('cart.empty')}</p>
+        <a href="/" data-link class="btn btn--primary">${t('cart.continue_shopping')}</a>
       </div>
     `;
     return { html, title: `${t('cart.title')} | Medusa Store` };
@@ -29,73 +33,86 @@ export const renderCart = async () => {
 
   const html = `
     <div class="cart-container">
-      <h1>${t('cart.title')}</h1>
+      <h1 class="cart-title">${t('cart.title')}</h1>
       
       <div class="cart-content">
-        <table class="cart-items" aria-label="${t('cart.title')}">
-          <thead>
-            <tr>
-              <th scope="col">${t('cart.item')}</th>
-              <th scope="col">${t('cart.price')}</th>
-              <th scope="col">${t('cart.quantity')}</th>
-              <th scope="col">${t('cart.total')}</th>
-              <th scope="col"><span class="sr-only">${t('cart.remove')}</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${cart.items.map((item: any) => `
-              <tr data-item-id="${item.id}">
-                <td class="item-info">
-                  <div class="item-details">
-                    <img src="${item.thumbnail}" alt="" aria-hidden="true" width="80" height="80" />
-                    <div>
-                      <span class="item-title">${item.title}</span>
-                      <span class="item-variant">${item.description || ''}</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="item-price">${formatPrice(item.unit_price)}</td>
-                <td class="item-quantity">
-                  <div class="quantity-controls">
-                    <button 
-                      class="qty-btn minus" 
-                      aria-label="Diminuisci quantità di ${item.title}"
-                      data-id="${item.id}"
-                      data-qty="${item.quantity - 1}"
-                      ${item.quantity <= 1 ? 'disabled' : ''}
-                    >-</button>
-                    <span aria-live="polite" aria-label="Quantità attuale: ${item.quantity}">${item.quantity}</span>
-                    <button 
-                      class="qty-btn plus" 
-                      aria-label="Aumenta quantità di ${item.title}"
-                      data-id="${item.id}"
-                      data-qty="${item.quantity + 1}"
-                    >+</button>
-                  </div>
-                </td>
-                <td class="item-total">${formatPrice(item.unit_price * item.quantity)}</td>
-                <td class="item-remove">
-                  <button 
-                    class="remove-btn" 
-                    aria-label="${t('cart.remove')} ${item.title}"
-                    data-id="${item.id}"
-                  >
-                    &times;
-                  </button>
-                </td>
+        <div class="cart-items-wrapper">
+          <table class="cart-items" aria-label="${t('cart.title')}">
+            <thead>
+              <tr>
+                <th scope="col">${t('cart.item')}</th>
+                <th scope="col" class="text-center">${t('cart.price')}</th>
+                <th scope="col" class="text-center">${t('cart.quantity')}</th>
+                <th scope="col" class="text-center">${t('cart.total')}</th>
+                <th scope="col"><span class="sr-only">${t('cart.remove')}</span></th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              ${cart.items.map((item: any) => `
+                <tr data-item-id="${item.id}">
+                  <td class="cart-item__info">
+                    <img src="${item.thumbnail}" alt="" aria-hidden="true" class="cart-item__image" width="80" height="80" />
+                    <div class="cart-item__details">
+                      <span class="cart-item__title">${item.title}</span>
+                      <span class="cart-item__variant text-muted">${item.description || ''}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">${formatPrice(item.unit_price)}</td>
+                  <td>
+                    <div class="cart-item__quantity">
+                      <button 
+                        class="btn-qty minus" 
+                        aria-label="${t('common.decrease')} ${t('cart.quantity')} ${item.title}"
+                        data-id="${item.id}"
+                        ${item.quantity <= 1 ? 'disabled' : ''}
+                      >
+                        ${getIcon({ name: 'minus', size: 'xs' })}
+                      </button>
+                      <label for="qty-${item.id}" class="sr-only">${t('cart.quantity')}</label>
+                      <input 
+                        type="number" 
+                        id="qty-${item.id}"
+                        class="qty-input" 
+                        value="${item.quantity}" 
+                        min="1" 
+                        data-id="${item.id}"
+                        aria-label="${t('cart.quantity')} ${item.title}"
+                      />
+                      <button 
+                        class="btn-qty plus" 
+                        aria-label="${t('common.increase')} ${t('cart.quantity')} ${item.title}"
+                        data-id="${item.id}"
+                      >
+                        ${getIcon({ name: 'plus', size: 'xs' })}
+                      </button>
+                    </div>
+                  </td>
+                  <td class="text-center font-bold">${formatPrice(item.unit_price * item.quantity)}</td>
+                  <td>
+                    <button 
+                      class="btn-remove" 
+                      aria-label="${t('cart.remove')} ${item.title}"
+                      data-id="${item.id}"
+                    >
+                      ${getIcon({ name: 'trash', size: 'sm' })}
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
 
         <aside class="cart-summary" aria-labelledby="summary-heading">
-          <h2 id="summary-heading">${t('cart.subtotal')}</h2>
-          <div class="summary-row">
+          <h2 id="summary-heading" class="cart-summary__title">${t('cart.subtotal')}</h2>
+          <div class="cart-summary__row">
             <span>${t('cart.subtotal')}</span>
-            <span class="total-amount" aria-live="polite" aria-atomic="true">${formatPrice(cart.total)}</span>
+            <span class="font-bold" aria-live="polite" aria-atomic="true">${formatPrice(cart.total)}</span>
           </div>
-          <button class="checkout-btn primary-btn" style="min-height: 44px;">${t('cart.checkout')}</button>
-          <a href="/" data-link class="back-to-store" style="display: inline-block; min-height: 44px; padding-top: 12px;">${t('cart.continue_shopping')}</a>
+          <div class="cart-summary__actions">
+            <a href="/checkout" data-link class="btn btn--primary btn--full checkout-btn">${t('cart.checkout')}</a>
+            <a href="/" data-link class="btn btn--secondary btn--full">${t('cart.continue_shopping')}</a>
+          </div>
         </aside>
       </div>
     </div>
@@ -109,6 +126,7 @@ export const renderCart = async () => {
  */
 export const initCartPage = () => {
   const updateQty = async (id: string, qty: number) => {
+    if (qty < 1) return;
     try {
       await cartStore.updateItem(id, qty);
       handleRoute(); // Refresh UI
@@ -126,16 +144,36 @@ export const initCartPage = () => {
     }
   };
 
-  document.querySelectorAll('.qty-btn').forEach(btn => {
+  // Plus/Minus buttons
+  document.querySelectorAll('.btn-qty').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const target = e.currentTarget as HTMLButtonElement;
       const id = target.dataset.id!;
-      const qty = parseInt(target.dataset.qty!);
+      const input = document.getElementById(`qty-${id}`) as HTMLInputElement;
+      let qty = parseInt(input.value);
+      
+      if (target.classList.contains('minus')) {
+        qty--;
+      } else {
+        qty++;
+      }
+      
       updateQty(id, qty);
     });
   });
 
-  document.querySelectorAll('.remove-btn').forEach(btn => {
+  // Direct input change
+  document.querySelectorAll('.qty-input').forEach(input => {
+    input.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      const id = target.dataset.id!;
+      const qty = parseInt(target.value);
+      updateQty(id, qty);
+    });
+  });
+
+  // Remove button
+  document.querySelectorAll('.btn-remove').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const target = e.currentTarget as HTMLButtonElement;
       const id = target.dataset.id!;

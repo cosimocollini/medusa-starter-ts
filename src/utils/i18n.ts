@@ -17,6 +17,8 @@ const translations = {
       save: 'Salva',
       cancel: 'Annulla',
       delete: 'Elimina',
+      increase: 'Aumenta',
+      decrease: 'Diminuisci',
     },
     auth: {
       email: 'Email',
