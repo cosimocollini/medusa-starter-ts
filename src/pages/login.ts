@@ -89,9 +89,10 @@ export const initLogin = () => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     
+    let originalText = submitBtn.textContent;
     try {
       submitBtn.disabled = true;
-      const originalText = submitBtn.textContent;
+      originalText = submitBtn.textContent;
       submitBtn.textContent = t('common.loading');
       errorBox?.classList.add('hidden');
 
@@ -105,7 +106,7 @@ export const initLogin = () => {
         errorBox.classList.remove('hidden');
       }
       submitBtn.disabled = false;
-      submitBtn.textContent = t('auth.submit');
+      submitBtn.textContent = originalText;
     }
   });
 };

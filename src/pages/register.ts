@@ -123,9 +123,10 @@ export const initRegister = () => {
       return;
     }
     
+    let originalText = submitBtn.textContent;
     try {
       submitBtn.disabled = true;
-      const originalText = submitBtn.textContent;
+      originalText = submitBtn.textContent;
       submitBtn.textContent = t('common.loading');
       errorBox?.classList.add('hidden');
 
@@ -137,7 +138,7 @@ export const initRegister = () => {
         errorBox.classList.remove('hidden');
       }
       submitBtn.disabled = false;
-      submitBtn.textContent = t('auth.register_title');
+      submitBtn.textContent = originalText;
     }
   });
 };

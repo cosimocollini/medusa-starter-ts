@@ -7,12 +7,14 @@
 @import './layout.css';
 @import './utilities.css';
 
-/* Component Imports */
-@import "./components/Button.css";
-@import "./components/Navbar.css";
-@import "./components/ProductCard.css";
-@import "./components/Icon.css";
-@import "./components/Cart.css";
-@import "./components/Checkout.css";
-@import "./components/Auth.css";
+/* Pages Imports */
+@import './pages/Cart.css';
+@import './pages/Checkout.css';
+@import './pages/Auth.css';
+@import './pages/Account.css';
 
+/* Component Imports */
+@import './components/Button.css';
+@import './components/Navbar.css';
+@import './components/ProductCard.css';
+@import './components/Icon.css';
