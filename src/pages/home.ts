@@ -5,14 +5,15 @@ export const renderHome = async () => {
   let productsHtml = '';
 
   try {
-    // Recupera i prodotti usando l'SDK ufficiale
     const { products } = await sdk.store.product.list();
 
     if (products.length === 0) {
       productsHtml = '<p>Nessun prodotto trovato.</p>';
     } else {
       // Cast temporaneo finché non migreremo completamente i tipi a @medusajs/types
-      productsHtml = products.map((product: any) => ProductCard(product)).join('');
+      productsHtml = products
+        .map((product: any) => ProductCard(product))
+        .join('');
     }
   } catch (error) {
     console.error('Errore nel caricamento prodotti:', error);

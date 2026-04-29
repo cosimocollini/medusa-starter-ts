@@ -36,16 +36,23 @@ export const renderNavbar = async () => {
           </a>
         </li>
         ${collectionsHtml}
-        <li class="navbar__item">
-          <a href="/cart" class="navbar__link" data-link aria-label="Carrello">
+        <li class="navbar__item navbar__item">
+          <a href="/cart" class="navbar__link navbar__link--cart" data-link aria-label="Carrello">
             ${getIcon({ name: 'cart', size: 'sm' })}
-            <span>Carrello</span>
+            <span class="sr-only">Carrello</span>
+            <span id="cart-count" data-count="0"></span>
+          </a>
+        </li>
+        <li class="navbar__item">
+          <a href="/wishlist" class="navbar__link" data-link aria-label="Wishlist">
+            ${getIcon({ name: 'favourite', size: 'sm' })}
+            <span class="sr-only">Wishlist</span>
           </a>
         </li>
         <li class="navbar__item">
           <a href="/account" class="navbar__link" data-link aria-label="Account">
             ${getIcon({ name: 'user', size: 'sm' })}
-            <span>Account</span>
+            <span class="sr-only">Account</span>
           </a>
         </li>
       </ul>

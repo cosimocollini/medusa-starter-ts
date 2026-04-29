@@ -4,7 +4,8 @@ const CART_KEY = 'medusa_cart_id';
 
 class CartStore {
   private cart: any = null;
-  private cartId: string | null = typeof window !== 'undefined' ? localStorage.getItem(CART_KEY) : null;
+  private cartId: string | null =
+    typeof window !== 'undefined' ? localStorage.getItem(CART_KEY) : null;
 
   constructor() {
     // Only initialize cart in browser environment
@@ -15,6 +16,15 @@ class CartStore {
 
   get currentCart() {
     return this.cart;
+  }
+
+  get cartItemCount() {
+    return this.cart
+      ? this.cart.items.reduce(
+          (total: number, item: any) => total + item.quantity,
+          0,
+        )
+      : 0;
   }
 
   private async initCart() {
@@ -67,9 +77,13 @@ class CartStore {
 
     try {
       // Aggiorna un articolo usando l'SDK
-      const { cart } = await sdk.store.cart.updateLineItem(this.cartId, lineItemId, {
-        quantity
-      });
+      const { cart } = await sdk.store.cart.updateLineItem(
+        this.cartId,
+        lineItemId,
+        {
+          quantity,
+        },
+      );
       this.cart = cart;
       this.dispatchUpdate();
       return cart;
@@ -87,7 +101,10 @@ class CartStore {
 
     try {
       // Rimuove un articolo usando l'SDK
-      const { cart } = await sdk.store.cart.deleteLineItem(this.cartId, lineItemId);
+      const { cart } = await sdk.store.cart.deleteLineItem(
+        this.cartId,
+        lineItemId,
+      );
       this.cart = cart;
       this.dispatchUpdate();
       return cart;
@@ -106,7 +123,7 @@ class CartStore {
       // Aggiorna il carrello con l'indirizzo usando l'SDK
       const { cart } = await sdk.store.cart.update(this.cartId, {
         shipping_address: address,
-        email: address.email
+        email: address.email,
       });
       this.cart = cart;
       this.dispatchUpdate();
@@ -125,7 +142,9 @@ class CartStore {
     try {
       // Recupera opzioni di spedizione (endpoint specifico, usiamo l'SDK)
       // Nota: le opzioni di spedizione sono spesso recuperate via sdk.store.fulfillment
-      const { shipping_options } = await sdk.store.fulfillment.listCartOptions(this.cartId);
+      const { shipping_options } = await sdk.store.fulfillment.listCartOptions(
+        this.cartId,
+      );
       return shipping_options;
     } catch (error) {
       console.error('Error fetching shipping options:', error);
@@ -141,7 +160,7 @@ class CartStore {
     try {
       // Aggiunge il metodo di spedizione usando l'SDK
       const { cart } = await sdk.store.cart.addShippingMethod(this.cartId, {
-        option_id: optionId
+        option_id: optionId,
       });
       this.cart = cart;
       this.dispatchUpdate();
@@ -179,9 +198,12 @@ class CartStore {
     if (!this.cartId) return;
     try {
       // In v2 usiamo initiatePaymentSession
-      const response = await sdk.store.payment.initiatePaymentSession(this.cartId, {
-        provider_id: providerId
-      });
+      const response = await sdk.store.payment.initiatePaymentSession(
+        this.cartId,
+        {
+          provider_id: providerId,
+        },
+      );
       // Aggiorniamo il carrello locale se necessario
       await this.initCart();
       return response;

@@ -18,45 +18,44 @@ import { renderCheckout, initCheckout } from '@/pages/checkout';
  */
 addRoute({
   path: '/',
-  render: renderHome
+  render: renderHome,
 });
 
 addRoute({
   path: '/checkout',
   render: renderCheckout,
-  init: initCheckout
+  init: initCheckout,
 });
 
 addRoute({
   path: '/cart',
   render: renderCart,
-  init: initCartPage
+  init: initCartPage,
 });
 
 addRoute({
   path: '/products/:handle',
   render: renderProductDetail,
-  init: initProductDetail
+  init: initProductDetail,
 });
 
 addRoute({
   path: '/login',
   render: renderLogin,
-  init: initLogin
+  init: initLogin,
 });
 
 addRoute({
   path: '/register',
   render: renderRegister,
-  init: initRegister
+  init: initRegister,
 });
 
 addRoute({
   path: '/account',
   render: renderAccount,
-  init: initAccount
+  init: initAccount,
 });
-
 
 addRoute({
   path: '/404',
@@ -91,14 +90,18 @@ if (typeof window !== 'undefined') {
     }
   });
 
-  // Listener per aggiornamenti del carrello (es. aggiornare un badge nell'header)
+  // Cart update listener
   window.addEventListener('cart-updated', (e: any) => {
     const cart = e.detail;
     console.log('Carrello aggiornato:', cart);
-    // Qui potremmo aggiornare un contatore nell'header se esistesse
+    let cartCount = document.getElementById('cart-count');
+    if (cart && cartCount) {
+      cartCount.setAttribute('data-count', cartStore.cartItemCount.toString());
+      cartCount.textContent = cartStore.cartItemCount;
+    }
   });
 
-  // Inizializza l'app al caricamento del DOM
+  // Init app
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
       // Se la navbar non è presente (es. siamo in dev mode), la iniettiamo ora
@@ -109,7 +112,6 @@ if (typeof window !== 'undefined') {
       handleRoute();
     });
   } else {
-    // Caso in cui il DOM è già pronto
     (async () => {
       if (!document.querySelector('.global-nav')) {
         const navHtml = await renderNavbar();

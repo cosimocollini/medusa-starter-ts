@@ -16,20 +16,49 @@
     --gray-800: #1f2937;
     --gray-900: #111827;
 
-    /* Semantic Colors */
-    --bg-surface: var(--color-white);
-    --bg-muted: var(--gray-100);
-    --bg-accent: var(--gray-900);
+    /* Catppuccin Latte (Light) Palette */
+    --ctp-latte-rosewater: #dc8a78;
+    --ctp-latte-flamingo: #dd7878;
+    --ctp-latte-pink: #ea76cb;
+    --ctp-latte-mauve: #8839ef;
+    --ctp-latte-red: #d20f39;
+    --ctp-latte-maroon: #e64553;
+    --ctp-latte-peach: #fe640b;
+    --ctp-latte-yellow: #df8e1d;
+    --ctp-latte-green: #40a02b;
+    --ctp-latte-teal: #179287;
+    --ctp-latte-sky: #04a5e5;
+    --ctp-latte-sapphire: #209fb5;
+    --ctp-latte-blue: #1e66f5;
+    --ctp-latte-lavender: #7287fd;
+    --ctp-latte-text: #4c4f69;
+    --ctp-latte-subtext1: #5c5f77;
+    --ctp-latte-subtext0: #6c6f85;
+    --ctp-latte-overlay2: #7c7f93;
+    --ctp-latte-overlay1: #8c8fa1;
+    --ctp-latte-overlay0: #9ca0b0;
+    --ctp-latte-surface2: #acb0be;
+    --ctp-latte-surface1: #bcc0cc;
+    --ctp-latte-surface0: #ccd0da;
+    --ctp-latte-base: #eff1f5;
+    --ctp-latte-mantle: #e6e9ef;
+    --ctp-latte-crust: #dce0e8;
 
-    --text-main: var(--gray-900);
-    --text-muted: var(--gray-600);
-    --text-inv: var(--color-white);
+    /* Semantic Colors - Defaulting to Latte */
+    --bg-surface: var(--ctp-latte-base);
+    --bg-muted: var(--ctp-latte-mantle);
+    --bg-accent: var(--ctp-latte-mauve);
 
-    --border-base: var(--gray-200);
-    --border-strong: var(--gray-300);
+    --text-main: var(--ctp-latte-text);
+    --text-muted: var(--ctp-latte-subtext1);
+    --text-inv: var(--ctp-latte-base);
+    --text-red: var(--ctp-latte-red);
 
-    --action-primary: var(--gray-900);
-    --action-hover: var(--gray-800);
+    --border-base: var(--ctp-latte-surface0);
+    --border-strong: var(--ctp-latte-surface1);
+
+    --action-primary: var(--ctp-latte-blue);
+    --action-hover: var(--ctp-latte-sapphire);
 
     /* Spacing Scale */
     --space-1: 0.25rem; /* 4px */
@@ -69,10 +98,10 @@
     --navbar-height: 4rem;
 
     /* Icon Sizes */
-    --icon-xs: 1rem;   /* 16px */
+    --icon-xs: 1rem; /* 16px */
     --icon-sm: 1.25rem; /* 20px */
-    --icon-md: 1.5rem;  /* 24px */
-    --icon-lg: 2rem;    /* 32px */
+    --icon-md: 1.5rem; /* 24px */
+    --icon-lg: 2rem; /* 32px */
 
     /* Breakpoints (for reference in @media queries)
        sm: 640px
@@ -86,22 +115,51 @@
     --container-card: card-container;
   }
 
-  /* Dark mode support (base) */
-  @media (prefers-color-scheme: dark) {
+  /* Dark mode support - Catppuccin Macchiato */
+  @media (prefers-color-scheme: light) {
     :root {
-      --bg-surface: var(--gray-900);
-      --bg-muted: var(--gray-800);
-      --bg-accent: var(--color-white);
+      /* Catppuccin Macchiato (Dark) Palette */
+      --ctp-macchiato-rosewater: #f4dbd6;
+      --ctp-macchiato-flamingo: #f0c6c6;
+      --ctp-macchiato-pink: #f5bde6;
+      --ctp-macchiato-mauve: #c6a0f6;
+      --ctp-macchiato-red: #ed8796;
+      --ctp-macchiato-maroon: #ee99a0;
+      --ctp-macchiato-peach: #f5a97f;
+      --ctp-macchiato-yellow: #eed49f;
+      --ctp-macchiato-green: #a6da95;
+      --ctp-macchiato-teal: #8bd5ca;
+      --ctp-macchiato-sky: #91d7e3;
+      --ctp-macchiato-sapphire: #7dc4e4;
+      --ctp-macchiato-blue: #8aadf4;
+      --ctp-macchiato-lavender: #b7bdf8;
+      --ctp-macchiato-text: #cad3f5;
+      --ctp-macchiato-subtext1: #b8c0e0;
+      --ctp-macchiato-subtext0: #a5adcb;
+      --ctp-macchiato-overlay2: #939ab7;
+      --ctp-macchiato-overlay1: #8087a2;
+      --ctp-macchiato-overlay0: #6e738d;
+      --ctp-macchiato-surface2: #5b6078;
+      --ctp-macchiato-surface1: #494d64;
+      --ctp-macchiato-surface0: #363a4f;
+      --ctp-macchiato-base: #24273a;
+      --ctp-macchiato-mantle: #1e2030;
+      --ctp-macchiato-crust: #181926;
 
-      --text-main: var(--gray-100);
-      --text-muted: var(--gray-400);
-      --text-inv: var(--gray-900);
+      /* Override Semantic Colors for Dark Mode */
+      --bg-surface: var(--ctp-macchiato-base);
+      --bg-muted: var(--ctp-macchiato-mantle);
+      --bg-accent: var(--ctp-macchiato-mauve);
 
-      --border-base: var(--gray-800);
-      --border-strong: var(--gray-700);
+      --text-main: var(--ctp-macchiato-text);
+      --text-muted: var(--ctp-macchiato-subtext1);
+      --text-inv: var(--ctp-macchiato-base);
 
-      --action-primary: var(--color-white);
-      --action-hover: var(--gray-200);
+      --border-base: var(--ctp-macchiato-surface0);
+      --border-strong: var(--ctp-macchiato-surface1);
+
+      --action-primary: var(--ctp-macchiato-blue);
+      --action-hover: var(--ctp-macchiato-sapphire);
     }
   }
 }
