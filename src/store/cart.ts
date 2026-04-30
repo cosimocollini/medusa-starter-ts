@@ -116,19 +116,52 @@ class CartStore {
 
   /**
    * Sets the shipping address for the current cart.
+   * Proactively switches region if the country is not supported by the current one.
    */
   async setShippingAddress(address: any) {
     if (!this.cartId) return;
+
     try {
-      // Aggiorna il carrello con l'indirizzo usando l'SDK
-      const { cart } = await sdk.store.cart.update(this.cartId, {
+      const countryCode = address.country_code;
+
+      // 1. Recupera tutte le regioni disponibili
+      const regions = await this.getRegions();
+
+      // 2. Trova la regione che include il paese richiesto
+      const correctRegion = regions.find((r: any) =>
+        r.countries?.some((c: any) => c.iso_2 === countryCode),
+      );
+
+      if (!correctRegion) {
+        throw new Error(
+          `Il paese con codice ${countryCode} non è supportato da nessuna regione configurata.`,
+        );
+      }
+
+      // 3. Recupera il carrello attuale per confrontare la regione
+      const { cart: currentCart } = await sdk.store.cart.retrieve(this.cartId);
+
+      const updateData: any = {
         shipping_address: address,
+        billing_address: address,
         email: address.email,
-      });
+      };
+
+      // 4. Se la regione è diversa, la aggiorniamo nello stesso comando
+      if (currentCart.region_id !== correctRegion.id) {
+        console.log(
+          `Region mismatch: cart is ${currentCart.region_id}, country ${countryCode} needs ${correctRegion.id}. Updating both.`,
+        );
+        updateData.region_id = correctRegion.id;
+      }
+
+      // 5. Aggiornamento atomico (evita loop e stati inconsistenti)
+      const { cart } = await sdk.store.cart.update(this.cartId, updateData);
+
       this.cart = cart;
       this.dispatchUpdate();
       return cart;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error setting shipping address:', error);
       throw error;
     }
@@ -140,8 +173,7 @@ class CartStore {
   async getShippingOptions() {
     if (!this.cartId) return [];
     try {
-      // Recupera opzioni di spedizione (endpoint specifico, usiamo l'SDK)
-      // Nota: le opzioni di spedizione sono spesso recuperate via sdk.store.fulfillment
+      // Recupera opzioni di spedizione
       const { shipping_options } = await sdk.store.fulfillment.listCartOptions(
         this.cartId,
       );
@@ -158,7 +190,6 @@ class CartStore {
   async setShippingMethod(optionId: string) {
     if (!this.cartId) return;
     try {
-      // Aggiunge il metodo di spedizione usando l'SDK
       const { cart } = await sdk.store.cart.addShippingMethod(this.cartId, {
         option_id: optionId,
       });
@@ -177,35 +208,35 @@ class CartStore {
   async createPaymentSessions() {
     if (!this.cartId) return;
     try {
-      // In Medusa v2, creiamo una sessione di pagamento (Payment Collection)
-      // Se vogliamo listare i provider: sdk.store.payment.listPaymentProviders()
-      // Per inizializzare: sdk.store.payment.initiatePaymentSession()
-      // Per semplicità qui simuliamo il vecchio comportamento o adattiamo
-      const { cart } = await sdk.store.cart.update(this.cartId, {}); // Spesso basta aggiornare per triggerare v2
+      const { cart } = await sdk.store.cart.retrieve(this.cartId);
       this.cart = cart;
       this.dispatchUpdate();
       return cart;
     } catch (error) {
-      console.error('Error creating payment sessions:', error);
+      console.error('Error refreshing cart for payment:', error);
       throw error;
     }
   }
 
   /**
-   * Selects a specific payment session.
+   * Selects a specific payment session and initiates it.
    */
   async selectPaymentSession(providerId: string) {
     if (!this.cartId) return;
     try {
-      // In v2 usiamo initiatePaymentSession
+      // In v2 passiamo il cartId e il provider
       const response = await sdk.store.payment.initiatePaymentSession(
         this.cartId,
         {
           provider_id: providerId,
         },
       );
-      // Aggiorniamo il carrello locale se necessario
-      await this.initCart();
+
+      // Dopo l'inizializzazione, recuperiamo il carrello aggiornato
+      const { cart } = await sdk.store.cart.retrieve(this.cartId);
+      this.cart = cart;
+      this.dispatchUpdate();
+
       return response;
     } catch (error) {
       console.error('Error selecting payment session:', error);
@@ -219,9 +250,7 @@ class CartStore {
   async completeOrder() {
     if (!this.cartId) return;
     try {
-      // Completa l'ordine usando l'SDK
       const response = await sdk.store.cart.complete(this.cartId);
-      // response può essere di tipo 'order' o 'cart'
       if ((response as any).type === 'order' || (response as any).order) {
         this.clear();
       }
@@ -229,6 +258,19 @@ class CartStore {
     } catch (error) {
       console.error('Error completing order:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Retrieves available regions from the Medusa backend.
+   */
+  async getRegions() {
+    try {
+      const { regions } = await sdk.store.region.list();
+      return regions;
+    } catch (error) {
+      console.error('Error fetching regions:', error);
+      return [];
     }
   }
 

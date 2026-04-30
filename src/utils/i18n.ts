@@ -19,6 +19,7 @@ const translations = {
       delete: 'Elimina',
       increase: 'Aumenta',
       decrease: 'Diminuisci',
+      confirm_delete: 'Sei sicuro di voler eliminare questo elemento?',
     },
     auth: {
       email: 'Email',
@@ -61,7 +62,10 @@ const translations = {
       addresses: 'Indirizzi',
       manage_addresses: 'Gestisci indirizzi',
       manage_addresses_desc: 'Gestisci i tuoi indirizzi di spedizione e fatturazione per un checkout più veloce.',
-      logout: 'Esci dal profilo'
+      logout: 'Esci dal profilo',
+      add_address: 'Aggiungi Indirizzo',
+      edit_address: 'Modifica Indirizzo',
+      no_addresses: 'Non hai ancora salvato alcun indirizzo.'
     },
     cart: {
       add_to_cart: 'Aggiungi al carrello',

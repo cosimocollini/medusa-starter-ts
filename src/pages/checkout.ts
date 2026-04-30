@@ -220,12 +220,21 @@ export const initCheckout = () => {
     };
 
     try {
+      errorBox?.classList.add('hidden');
+      submitBtn.disabled = true;
+      
       await cartStore.setShippingAddress(address);
       const options = await cartStore.getShippingOptions();
       renderShippingOptions(options);
       shippingSection?.removeAttribute('hidden');
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      if (errorBox) {
+        errorBox.textContent = e.message || t('checkout.error');
+        errorBox.classList.remove('hidden');
+      }
+    } finally {
+      submitBtn.disabled = false;
     }
   };
 
@@ -248,14 +257,24 @@ export const initCheckout = () => {
       radio.addEventListener('change', async () => {
         try {
           await cartStore.setShippingMethod(radio.value);
-          await cartStore.createPaymentSessions();
-          const cart = await cartStore.selectPaymentSession('stripe');
           
-          paymentSection?.removeAttribute('hidden');
+          // In Medusa 2.0, we initiate a payment session for a specific provider.
+          // Standard Stripe provider ID is 'pp_stripe_stripe'
+          const response = await cartStore.selectPaymentSession('pp_stripe_stripe');
+          
+          // Extract client_secret from Medusa 2.0 response structure:
+          // response.payment_collection.payment_sessions[].data.client_secret
+          const paymentCollection = response?.payment_collection;
+          const session = paymentCollection?.payment_sessions?.find(
+            (s: any) => s.provider_id === 'pp_stripe_stripe'
+          );
+          const clientSecret = session?.data?.client_secret;
 
-          // Initialize Stripe Payment Element if possible
-          if (stripe && cart?.payment_session?.data?.client_secret) {
-            mountStripePaymentElement(cart.payment_session.data.client_secret);
+          if (clientSecret && stripe) {
+            paymentSection?.removeAttribute('hidden');
+            mountStripePaymentElement(clientSecret);
+          } else {
+            console.error('Could not initiate Stripe session or client_secret missing');
           }
         } catch (e) {
           console.error('Error in payment session initialization:', e);

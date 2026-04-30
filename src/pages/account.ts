@@ -2,6 +2,7 @@ import { authStore } from '@/store/auth';
 import { navigate, handleRoute } from '@/router';
 import { t } from '@/utils/i18n';
 import { getIcon } from '@/utils/icons';
+import { renderAccountLayout } from '@/components/AccountLayout';
 
 /**
  * Renders the customer account dashboard (WCAG 2.1 compliant).
@@ -34,123 +35,88 @@ export const renderAccount = async () => {
       }).format(amount / 100);
     };
 
-    const html = `
-      <div class="account-container">
-        <div class="account-layout">
-          <aside class="account-sidebar" aria-label="Menu Account">
-            <nav class="account-nav">
-              <ul>
-                <li>
-                  <a href="/account" class="account-nav__link active" data-link>
-                    ${getIcon({ name: 'home', size: 'sm' })}
-                    ${t('account.dashboard')}
+    const dashboardContent = `
+      <header class="account-header">
+        <h1 class="account-title">${t('account.title')}</h1>
+        <p class="welcome-msg">${t('account.welcome')}, <strong>${user?.first_name} ${user?.last_name}</strong></p>
+      </header>
+      
+      <section class="account-overview">
+        <div class="overview-card">
+          <div class="overview-card__header">
+            <h2 class="overview-card__title">
+              ${getIcon({ name: 'cart', size: 'sm' })}
+              ${t('account.recent_orders')}
+            </h2>
+            ${orders.length > 5 ? `<a href="/account/orders" class="see-all-link" data-link>${t('account.see_all_orders')}</a>` : ''}
+          </div>
+          
+          ${
+            orders.length === 0
+              ? `
+            <p role="status" class="empty-state">${t('account.no_orders')}</p>
+          `
+              : `
+            <div class="orders-list">
+              ${orders.slice(0, 5).map(order => `
+                <div class="order-item-card">
+                  <div class="order-meta">
+                    <span class="order-id">#${order.display_id}</span>
+                    <span class="order-date">${new Date(order.created_at).toLocaleDateString('it-IT')}</span>
+                  </div>
+                  <div class="order-details">
+                    <span class="order-total">${formatPrice(order.total, order.currency_code)}</span>
+                    <span class="status-badge ${order.status}">${order.status}</span>
+                  </div>
+                  <a href="/account/orders/${order.id}" class="view-order-link btn btn--secondary btn--sm" data-link>
+                    ${t('account.view_details')}
                   </a>
-                </li>
-                <li>
-                  <a href="/account/orders" class="account-nav__link" data-link>
-                    ${getIcon({ name: 'cart', size: 'sm' })}
-                    ${t('account.orders')}
-                  </a>
-                </li>
-                <li>
-                  <a href="/account/profile" class="account-nav__link" data-link>
-                    ${getIcon({ name: 'user', size: 'sm' })}
-                    ${t('account.profile')}
-                  </a>
-                </li>
-                <li>
-                  <button id="logout-btn" class="account-nav__link account-nav__link--logout">
-                    ${getIcon({ name: 'user', size: 'sm' })}
-                    ${t('account.logout')}
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </aside>
-
-          <main class="account-main-content">
-            <header class="account-header">
-              <h1 class="account-title">${t('account.title')}</h1>
-              <p class="welcome-msg">${t('account.welcome')}, <strong>${user?.first_name} ${user?.last_name}</strong></p>
-            </header>
-            
-            <section class="account-overview">
-              <div class="overview-card">
-                <div class="overview-card__header">
-                  <h2 class="overview-card__title">
-                    ${getIcon({ name: 'cart', size: 'sm' })}
-                    ${t('account.recent_orders')}
-                  </h2>
-                  ${orders.length > 5 ? `<a href="/account/orders" class="see-all-link" data-link>${t('account.see_all_orders')}</a>` : ''}
                 </div>
-                
-                ${
-                  orders.length === 0
-                    ? `
-                  <p role="status" class="empty-state">${t('account.no_orders')}</p>
-                `
-                    : `
-                  <div class="orders-list">
-                    ${orders.slice(0, 5).map(order => `
-                      <div class="order-item-card">
-                        <div class="order-meta">
-                          <span class="order-id">#${order.display_id}</span>
-                          <span class="order-date">${new Date(order.created_at).toLocaleDateString('it-IT')}</span>
-                        </div>
-                        <div class="order-details">
-                          <span class="order-total">${formatPrice(order.total, order.currency_code)}</span>
-                          <span class="status-badge ${order.status}">${order.status}</span>
-                        </div>
-                        <a href="/account/orders/${order.id}" class="view-order-link btn btn--secondary btn--sm" data-link>
-                          ${t('account.view_details')}
-                        </a>
-                      </div>
-                    `).join('')}
-                  </div>
-                `
-                }
-              </div>
-
-              <div class="overview-grid">
-                <div class="overview-card">
-                  <div class="overview-card__header">
-                    <h2 class="overview-card__title">
-                      ${getIcon({ name: 'user', size: 'sm' })}
-                      ${t('account.profile_info')}
-                    </h2>
-                  </div>
-                  <div class="profile-info">
-                    <p><strong>${t('auth.email')}:</strong> ${user?.email}</p>
-                    <p><strong>${t('auth.first_name')}:</strong> ${user?.first_name}</p>
-                    <p><strong>${t('auth.last_name')}:</strong> ${user?.last_name}</p>
-                    <a href="/account/profile" class="edit-link" data-link>
-                      ${getIcon({ name: 'user', size: 'xs' })}
-                      ${t('common.edit')}
-                    </a>
-                  </div>
-                </div>
-                
-                <div class="overview-card">
-                  <div class="overview-card__header">
-                    <h2 class="overview-card__title">
-                      ${getIcon({ name: 'home', size: 'sm' })}
-                      ${t('account.addresses')}
-                    </h2>
-                  </div>
-                  <div class="profile-info">
-                    <p>${t('account.manage_addresses_desc')}</p>
-                    <a href="/account/addresses" class="manage-link" data-link>
-                      ${getIcon({ name: 'home', size: 'xs' })}
-                      ${t('account.manage_addresses')}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </main>
+              `).join('')}
+            </div>
+          `
+          }
         </div>
-      </div>
+
+        <div class="overview-grid">
+          <div class="overview-card">
+            <div class="overview-card__header">
+              <h2 class="overview-card__title">
+                ${getIcon({ name: 'user', size: 'sm' })}
+                ${t('account.profile_info')}
+              </h2>
+            </div>
+            <div class="profile-info">
+              <p><strong>${t('auth.email')}:</strong> ${user?.email}</p>
+              <p><strong>${t('auth.first_name')}:</strong> ${user?.first_name}</p>
+              <p><strong>${t('auth.last_name')}:</strong> ${user?.last_name}</p>
+              <a href="/account/profile" class="edit-link" data-link>
+                ${getIcon({ name: 'user', size: 'xs' })}
+                ${t('common.edit')}
+              </a>
+            </div>
+          </div>
+          
+          <div class="overview-card">
+            <div class="overview-card__header">
+              <h2 class="overview-card__title">
+                ${getIcon({ name: 'home', size: 'sm' })}
+                ${t('account.addresses')}
+              </h2>
+            </div>
+            <div class="profile-info">
+              <p>${t('account.manage_addresses_desc')}</p>
+              <a href="/account/addresses" class="manage-link" data-link>
+                ${getIcon({ name: 'home', size: 'xs' })}
+                ${t('account.manage_addresses')}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     `;
+
+    const html = renderAccountLayout(dashboardContent, 'dashboard');
 
     return { html, title: `${t('account.title')} | Medusa Store` };
   }
@@ -163,7 +129,7 @@ export const renderAccount = async () => {
 };
 
 /**
- * Initializes account dashboard logic (logout and auth listeners).
+ * Initializes account dashboard logic.
  */
 export const initAccount = () => {
   const logoutBtn = document.getElementById('logout-btn');
@@ -178,12 +144,13 @@ export const initAccount = () => {
     });
   }
 
-  // If we are showing the shell, listen for auth changes to re-render
+  // Handle re-render on auth change
   if (document.getElementById('account-shell')) {
     const onAuthChange = () => {
       window.removeEventListener('auth-state-changed', onAuthChange);
-      handleRoute(); // Trigger re-render of current route
+      handleRoute();
     };
     window.addEventListener('auth-state-changed', onAuthChange);
   }
 };
+

@@ -5,6 +5,7 @@ export interface Customer {
   email: string;
   first_name?: string;
   last_name?: string;
+  addresses?: any[];
 }
 
 /**
@@ -16,7 +17,10 @@ class AuthStore {
   private isLoaded = false;
 
   constructor() {
-    this.checkSession();
+    // Only check session in browser environment
+    if (typeof window !== 'undefined') {
+      this.checkSession();
+    }
   }
 
   /**
@@ -24,7 +28,10 @@ class AuthStore {
    */
   async checkSession() {
     try {
-      const { customer } = await sdk.store.customer.retrieve();
+      // Per Medusa 2.0 recuperiamo il profilo completo inclusi gli indirizzi
+      const { customer } = await sdk.store.customer.retrieve({
+        fields: '+addresses',
+      });
       this.customer = customer as Customer;
     } catch (error) {
       // Not authenticated or session expired
@@ -37,20 +44,17 @@ class AuthStore {
 
   /**
    * Logs in a customer using email and password.
-   * Medusa 2.0 auth flow: login returns a JWT which the SDK stores automatically.
    */
   async login(email: string, password: string): Promise<Customer> {
     try {
       await sdk.auth.login('customer', 'emailpass', {
         email,
-        password
+        password,
       });
-      
+
       // After login, retrieve the customer profile
-      const { customer } = await sdk.store.customer.retrieve();
-      this.customer = customer as Customer;
-      this.dispatchUpdate();
-      return this.customer;
+      await this.checkSession();
+      return this.customer!;
     } catch (error) {
       this.customer = null;
       throw error;
@@ -71,21 +75,18 @@ class AuthStore {
 
   /**
    * Registers a new customer on the Medusa backend.
-   * Medusa 2.0: 1. register identity, 2. create customer profile.
    */
   async register(data: any): Promise<Customer> {
     try {
-      // Step 1: Register the identity with email/pass provider
       await sdk.auth.register('customer', 'emailpass', {
         email: data.email,
-        password: data.password
+        password: data.password,
       });
 
-      // Step 2: Create the customer profile
       const { customer } = await sdk.store.customer.create({
         email: data.email,
         first_name: data.first_name,
-        last_name: data.last_name
+        last_name: data.last_name,
       });
 
       this.customer = customer as Customer;
@@ -93,6 +94,56 @@ class AuthStore {
       return this.customer;
     } catch (error) {
       this.customer = null;
+      throw error;
+    }
+  }
+
+  /**
+   * Adds a new address to the customer profile.
+   */
+  async addAddress(address: any) {
+    try {
+      const { customer } = await sdk.store.customer.createAddress({
+        ...address,
+      });
+      this.customer = customer as Customer;
+      this.dispatchUpdate();
+      return customer;
+    } catch (error) {
+      console.error('Error adding address:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Updates an existing address in the customer profile.
+   */
+  async updateAddress(addressId: string, address: any) {
+    try {
+      const { customer } = await sdk.store.customer.updateAddress(
+        addressId,
+        address,
+      );
+      this.customer = customer as Customer;
+      this.dispatchUpdate();
+      return customer;
+    } catch (error) {
+      console.error('Error updating address:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Deletes an address from the customer profile.
+   */
+  async deleteAddress(addressId: string) {
+    try {
+      const { customer } = await sdk.store.customer.deleteAddress(addressId);
+      this.customer = customer as Customer;
+      this.dispatchUpdate();
+      return customer;
+    } catch (error) {
+      console.error('Error deleting address:', error);
       throw error;
     }
   }
@@ -129,12 +180,14 @@ class AuthStore {
    */
   private dispatchUpdate() {
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('auth-state-changed', { 
-        detail: { 
-          isAuthenticated: this.isAuthenticated,
-          user: this.customer
-        } 
-      }));
+      window.dispatchEvent(
+        new CustomEvent('auth-state-changed', {
+          detail: {
+            isAuthenticated: this.isAuthenticated,
+            user: this.customer,
+          },
+        }),
+      );
     }
   }
 }
