@@ -5,6 +5,7 @@ import { renderLogin, initLogin } from '@/pages/login';
 import { renderRegister, initRegister } from '@/pages/register';
 import { renderAccount, initAccount } from '@/pages/account';
 import { renderAddresses, initAddresses } from '@/pages/addresses';
+import { renderPayments, initPayments } from '@/pages/payments';
 import { cartStore } from '@/store/cart';
 import { renderNavbar } from '@/components/Navbar';
 
@@ -62,6 +63,12 @@ addRoute({
   path: '/account/addresses',
   render: renderAddresses,
   init: initAddresses,
+});
+
+addRoute({
+  path: '/account/payments',
+  render: renderPayments,
+  init: initPayments,
 });
 
 addRoute({

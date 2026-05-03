@@ -126,6 +126,8 @@ class CartStore {
 
       // 1. Recupera tutte le regioni disponibili
       const regions = await this.getRegions();
+      console.log('Regioni disponibili:', regions); // ← aggiungi questo
+      console.log('Country code cercato:', address.country_code);
 
       // 2. Trova la regione che include il paese richiesto
       const correctRegion = regions.find((r: any) =>
@@ -174,9 +176,9 @@ class CartStore {
     if (!this.cartId) return [];
     try {
       // Recupera opzioni di spedizione
-      const { shipping_options } = await sdk.store.fulfillment.listCartOptions(
-        this.cartId,
-      );
+      const { shipping_options } = await sdk.store.fulfillment.listCartOptions({
+        cart_id: this.cartId,
+      });
       return shipping_options;
     } catch (error) {
       console.error('Error fetching shipping options:', error);
@@ -226,7 +228,7 @@ class CartStore {
     try {
       // In v2 passiamo il cartId e il provider
       const response = await sdk.store.payment.initiatePaymentSession(
-        this.cartId,
+        this.cart,
         {
           provider_id: providerId,
         },

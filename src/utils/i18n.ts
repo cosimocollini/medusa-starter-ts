@@ -65,7 +65,13 @@ const translations = {
       logout: 'Esci dal profilo',
       add_address: 'Aggiungi Indirizzo',
       edit_address: 'Modifica Indirizzo',
-      no_addresses: 'Non hai ancora salvato alcun indirizzo.'
+      no_addresses: 'Non hai ancora salvato alcun indirizzo.',
+      payment_methods: 'Metodi di Pagamento',
+      manage_payments: 'Gestisci metodi di pagamento',
+      manage_payments_desc: 'Gestisci le tue carte di credito salvate per acquisti più rapidi.',
+      add_payment_method: 'Aggiungi Carta',
+      no_payment_methods: 'Non hai ancora salvato alcun metodo di pagamento.',
+      delete_payment_method_confirm: 'Sei sicuro di voler eliminare questa carta?'
     },
     cart: {
       add_to_cart: 'Aggiungi al carrello',

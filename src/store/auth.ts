@@ -154,12 +154,82 @@ class AuthStore {
   async getOrders(): Promise<any[]> {
     if (!this.customer) return [];
     try {
-      // Medusa 2.0: sdk.store.order.list() returns orders for the authenticated customer
       const { orders } = await sdk.store.order.list();
       return orders;
     } catch (error) {
       console.error('Error fetching orders:', error);
       return [];
+    }
+  }
+
+  /**
+   * Retrieves saved payment methods from Stripe via custom backend endpoint.
+   */
+  // async getSavedPaymentMethods(): Promise<any[]> {
+  //   if (!this.customer) return [];
+  //   try {
+  //     const response = await (sdk.client.fetch as any)(
+  //       `/store/payment-methods/${this.customer.id}`,
+  //       { method: 'GET' },
+  //     );
+  //     return response.payment_methods || [];
+  //   } catch (error) {
+  //     console.error('Error fetching payment methods:', error);
+  //     return [];
+  //   }
+  // }
+
+  async getSavedPaymentMethods(): Promise<any[]> {
+    if (!this.customer) return [];
+    try {
+      // Prima recupera l'account holder legato al customer
+      const { payment_accounts } = await (sdk.client.fetch as any)(
+        `/store/payment-accounts`,
+        { method: 'GET' },
+      );
+
+      if (!payment_accounts?.length) return [];
+
+      const accountHolderId = payment_accounts[0].id;
+
+      const response = await (sdk.client.fetch as any)(
+        `/store/payment-methods/${accountHolderId}`,
+        { method: 'GET' },
+      );
+      return response.payment_methods || [];
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Deletes a saved payment method.
+   */
+  async deletePaymentMethod(methodId: string) {
+    try {
+      await (sdk.client.fetch as any)(`/store/payment-methods/${methodId}`, {
+        method: 'DELETE',
+      });
+    } catch (error) {
+      console.error('Error deleting payment method:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Creates a SetupIntent on the backend to allow adding a new card.
+   */
+  async createSetupIntent() {
+    try {
+      const response = await (sdk.client.fetch as any)(
+        '/store/payment-methods/setup-intent',
+        { method: 'POST' },
+      );
+      return response.setup_intent; // Should contain client_secret
+    } catch (error) {
+      console.error('Error creating setup intent:', error);
+      throw error;
     }
   }
 

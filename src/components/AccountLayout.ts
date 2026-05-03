@@ -37,6 +37,12 @@ export const renderAccountLayout = (content: string, activeTab: string) => {
                 </a>
               </li>
               <li>
+                <a href="/account/payments" class="account-nav__link ${activeTab === 'payments' ? 'active' : ''}" data-link>
+                  ${getIcon({ name: 'cart', size: 'sm' })}
+                  ${t('account.payment_methods')}
+                </a>
+              </li>
+              <li>
                 <button id="logout-btn" class="account-nav__link account-nav__link--logout">
                   ${getIcon({ name: 'user', size: 'sm' })}
                   ${t('account.logout')}
