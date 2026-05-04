@@ -38,7 +38,7 @@ export const renderCheckout = async () => {
   };
 
   const html = `
-    <main class="checkout-container">
+    <main class="container container--lg checkout-container">
       <h1 class="checkout-title" id="checkout-heading">${t('checkout.title')}</h1>
       
       <div class="checkout-layout">

@@ -13,7 +13,7 @@ export const renderAccount = async () => {
   // If in SSG/Node.js, just return a shell
   if (typeof window === 'undefined') {
     return {
-      html: `<div id="account-shell" class="account-container"><p>${t('common.loading')}</p></div>`,
+      html: `<div id="account-shell" class="container account-container"><p>${t('common.loading')}</p></div>`,
       title: `${t('account.title')} | Medusa Store`,
     };
   }
@@ -123,7 +123,7 @@ export const renderAccount = async () => {
 
   // Still initializing auth on client
   return {
-    html: `<div id="account-shell" class="account-container"><p>${t('common.loading')}</p></div>`,
+    html: `<div id="account-shell" class="container account-container"><p>${t('common.loading')}</p></div>`,
     title: `${t('account.title')} | Medusa Store`,
   };
 };

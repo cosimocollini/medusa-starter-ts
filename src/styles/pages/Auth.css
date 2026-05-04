@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-inline: clamp(var(--space-4), 5vw, var(--space-12));
     padding-block: var(--space-12);
     min-height: calc(100vh - var(--navbar-height) - 100px);
     background: var(--bg-muted);

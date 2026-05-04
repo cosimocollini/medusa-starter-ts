@@ -11,12 +11,16 @@ export const renderNavbar = async () => {
   try {
     // In Medusa v2 collections are accessed via sdk.store.collection
     const { collections } = await sdk.store.collection.list();
+    const { product_categories } =
+      await sdk.store.category.list();
+    console.log('COLLECTIONS', collections);
+    console.log('CAT', product_categories);
 
-    collectionsHtml = collections
+    collectionsHtml = product_categories
       .map(
         (collection: any) => `
         <li class="navbar__item">
-          <a href="/collections/${collection.handle}" class="navbar__link" data-link>${collection.title}</a>
+          <a href="/collections/${collection.handle}" class="navbar__link" data-link>${collection.name}</a>
         </li>
       `,
       )

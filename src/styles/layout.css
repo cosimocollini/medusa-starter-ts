@@ -3,11 +3,23 @@
     width: 100%;
     max-width: var(--container-max-width);
     margin-inline: auto;
-    padding-inline: var(--space-4);
+    /* Dynamic horizontal padding: scales from 16px to 48px based on viewport width */
+    padding-inline: clamp(var(--space-4), 5vw, var(--space-12));
     /* Define as a container for children to query */
     container-type: inline-size;
     container-name: var(--container-main);
   }
+
+  /* Container Size Modifiers */
+  .container--sm { --container-max-width: var(--container-sm); }
+  .container--md { --container-max-width: var(--container-md); }
+  .container--lg { --container-max-width: var(--container-lg); }
+  .container--xl { --container-max-width: var(--container-xl); }
+  .container--2xl { --container-max-width: var(--container-2xl); }
+  .container--full { --container-max-width: 100%; }
+
+  /* Optimal reading width for text content (approx 75 characters) */
+  .container--reading { --container-max-width: 75ch; }
 
   .grid {
     display: grid;

@@ -36,7 +36,7 @@ export const renderProductDetail = async (params?: Record<string, string>) => {
     const currencyCode = price?.currency_code || 'EUR';
 
     const html = `
-      <main class="product-detail-container">
+      <main class="container container--xl product-detail-container">
         <nav aria-label="Breadcrumb">
           <a href="/" data-link aria-label="Torna al catalogo">${t('product.back')}</a>
         </nav>

@@ -1,8 +1,5 @@
 @layer components {
   .account-container {
-    max-width: var(--container-max-width);
-    margin-inline: auto;
-    padding-inline: var(--space-4);
     padding-block: var(--space-8);
   }
 

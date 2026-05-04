@@ -16,7 +16,7 @@ let card: any = null;
 export const renderPayments = async () => {
   if (typeof window === 'undefined') {
     return {
-      html: `<div id="account-shell" class="account-container"><p>${t('common.loading')}</p></div>`,
+      html: `<div id="account-shell" class="container account-container"><p>${t('common.loading')}</p></div>`,
       title: `${t('account.payment_methods')} | Medusa Store`,
     };
   }
@@ -90,7 +90,7 @@ export const renderPayments = async () => {
   }
 
   return {
-    html: `<div id="account-shell" class="account-container"><p>${t('common.loading')}</p></div>`,
+    html: `<div id="account-shell" class="container account-container"><p>${t('common.loading')}</p></div>`,
     title: `${t('account.payment_methods')} | Medusa Store`,
   };
 };

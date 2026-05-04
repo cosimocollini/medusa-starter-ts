@@ -1,8 +1,6 @@
 @layer components {
   .checkout-container {
-    max-width: var(--container-max-width);
-    margin-inline: auto;
-    padding-inline: var(--space-4);
+    /* Inherits from .container or uses same dynamic padding */
     padding-block: var(--space-8);
   }
 

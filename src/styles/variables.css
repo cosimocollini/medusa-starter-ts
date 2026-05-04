@@ -94,7 +94,12 @@
       0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
 
     /* Layout */
-    --container-max-width: 1280px;
+    --container-sm: 640px;
+    --container-md: 768px;
+    --container-lg: 1024px;
+    --container-xl: 1280px;
+    --container-2xl: 1536px;
+    --container-max-width: var(--container-xl);
     --navbar-height: 4rem;
 
     /* Icon Sizes */

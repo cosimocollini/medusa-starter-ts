@@ -2,6 +2,9 @@
 
 A lightweight e-commerce frontend built with TypeScript and Vite, designed to work seamlessly with the Medusa 2.0 headless commerce engine. This project features a custom Single Page Application (SPA) architecture with Static Site Generation (SSG) capabilities.
 
+## Documentation and Code Comments
+- **Language Requirement**: All code comments, documentation (including this file), and technical plans MUST be written in **English** by default, unless explicitly requested otherwise by the user.
+
 ## Project Overview
 
 - **Core Technologies**: [Vite](https://vitejs.dev/), [TypeScript](https://www.typescriptlang.org/), [Medusa 2.0 SDK](https://medusajs.com/).
@@ -79,11 +82,23 @@ The project follows a modern, modular CSS architecture based on **CSS Layers** a
 
 ### Structure (`src/styles/`)
 - `index.css`: Main entry point and layer definitions.
-- `tokens.css`: Design tokens (colors, spacing, typography) using CSS variables.
+- `variables.css`: Design tokens (colors, spacing, typography, layout) using CSS variables.
 - `base.css`: Modern reset and base element styles.
 - `layout.css`: Global layout patterns (containers, grids).
 - `utilities.css`: Utility classes for spacing, typography, and accessibility.
 - `components/`: Modular styles for specific UI components (e.g., `ProductCard.css`).
+
+### Container System
+The project uses a hybrid container system combining fluid dynamic padding and explicit size modifiers:
+- **Dynamic Padding**: Uses `clamp()` to scale `padding-inline` proportionally to viewport width (e.g., 16px to 48px).
+- **Size Modifiers**: Utility classes for different maximum widths:
+  - `.container--sm`: 640px (Small content/forms)
+  - `.container--md`: 768px (Medium content)
+  - `.container--lg`: 1024px (Large content, optimized for Checkout)
+  - `.container--xl`: 1280px (Standard wide layout, optimized for Product Detail)
+  - `.container--2xl`: 1536px (Very wide layouts)
+  - `.container--reading`: 75ch (Optimized for text readability)
+  - `.container--full`: 100% (Full screen width)
 
 ### Conventions
 - **BEM Methodology**: Use Block-Element-Modifier (e.g., `.btn--primary`) for component styles.

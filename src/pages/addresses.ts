@@ -13,7 +13,7 @@ let currentAddress: any = null;
 export const renderAddresses = async () => {
   if (typeof window === 'undefined') {
     return {
-      html: `<div id="account-shell" class="account-container"><p>${t('common.loading')}</p></div>`,
+      html: `<div id="account-shell" class="container account-container"><p>${t('common.loading')}</p></div>`,
       title: `${t('account.addresses')} | Medusa Store`,
     };
   }
@@ -121,7 +121,7 @@ export const renderAddresses = async () => {
   }
 
   return {
-    html: `<div id="account-shell" class="account-container"><p>${t('common.loading')}</p></div>`,
+    html: `<div id="account-shell" class="container account-container"><p>${t('common.loading')}</p></div>`,
     title: `${t('account.addresses')} | Medusa Store`,
   };
 };

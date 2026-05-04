@@ -7,7 +7,7 @@ import { t } from '@/utils/i18n';
  */
 export const renderAccountLayout = (content: string, activeTab: string) => {
   return `
-    <div class="account-container">
+    <div class="container account-container">
       <div class="account-layout">
         <aside class="account-sidebar" aria-label="Menu Account">
           <nav class="account-nav">

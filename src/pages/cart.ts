@@ -12,7 +12,7 @@ export const renderCart = async () => {
 
   if (!cart || cart.items.length === 0) {
     const html = `
-      <div class="cart-container empty-cart">
+      <div class="container cart-container empty-cart">
         <div class="empty-cart__icon">
           ${getIcon({ name: 'cart', size: 'lg' })}
         </div>
@@ -32,7 +32,7 @@ export const renderCart = async () => {
   };
 
   const html = `
-    <div class="cart-container">
+    <div class="container cart-container">
       <h1 class="cart-title">${t('cart.title')}</h1>
       
       <div class="cart-content">
