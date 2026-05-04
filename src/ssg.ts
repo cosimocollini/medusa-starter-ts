@@ -34,19 +34,28 @@ const generateSSG = async () => {
   // Helper to inject content into template
   const inject = (htmlTemplate: string, content: string, title: string) => {
     return htmlTemplate
-      .replace('<div id="app"></div>', `${globalNavbarHtml}\n    <div id="app">${content}</div>`)
+      .replace(
+        '<div id="app"></div>',
+        `${globalNavbarHtml}\n    <div id="app">${content}</div>`,
+      )
       .replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
   };
 
   const writePage = (dirPath: string, content: string, title: string) => {
     if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
-    fs.writeFileSync(path.resolve(dirPath, 'index.html'), inject(template, content, title));
+    fs.writeFileSync(
+      path.resolve(dirPath, 'index.html'),
+      inject(template, content, title),
+    );
   };
 
   try {
     // 1. Core Pages
     const homeData = await renderHome();
-    fs.writeFileSync(templatePath, inject(template, homeData.html, homeData.title));
+    fs.writeFileSync(
+      templatePath,
+      inject(template, homeData.html, homeData.title),
+    );
     console.log('✓ Home page prerendered.');
 
     const pages = [
@@ -67,12 +76,19 @@ const generateSSG = async () => {
     const { products } = await sdk.store.product.list();
     console.log(`Found ${products.length} products to prerender.`);
 
-    if (!fs.existsSync(PRODUCTS_PATH)) fs.mkdirSync(PRODUCTS_PATH, { recursive: true });
+    if (!fs.existsSync(PRODUCTS_PATH))
+      fs.mkdirSync(PRODUCTS_PATH, { recursive: true });
 
     for (const product of products) {
-      console.log(`Prerendering: ${product.title} (/products/${product.handle})`);
+      console.log(
+        `Prerendering: ${product.title} (/products/${product.handle})`,
+      );
       const productData = await renderProductDetail({ handle: product.handle });
-      writePage(path.resolve(PRODUCTS_PATH, product.handle), productData.html, productData.title);
+      writePage(
+        path.resolve(PRODUCTS_PATH, product.handle),
+        productData.html,
+        productData.title,
+      );
     }
 
     console.log('--- SSG Completed successfully! ---');

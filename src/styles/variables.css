@@ -99,7 +99,7 @@
     --container-lg: 1024px;
     --container-xl: 1280px;
     --container-2xl: 1536px;
-    --container-max-width: var(--container-xl);
+    --container-max-width: var(--container-2xl);
     --navbar-height: 4rem;
 
     /* Icon Sizes */
